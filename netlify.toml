@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist/don-francisco/browser"
 
+[[plugins]]
+  package = "@netlify/angular-runtime"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
