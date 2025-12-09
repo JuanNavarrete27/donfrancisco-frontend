@@ -1,0 +1,14 @@
+[build]
+  command = "npm run build"
+  publish = "dist/don-francisco/browser"
+
+[[plugins]]
+  # Angular 19 SSR requires runtime v2.2.0+; use the project-installed plugin
+  # version (declared in package.json) so Netlify picks up the compatible
+  # release without relying on implicit version resolution.
+  package = "@netlify/angular-runtime"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
