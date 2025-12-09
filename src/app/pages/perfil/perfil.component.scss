@@ -89,6 +89,18 @@
   }
 }
 
+.perfil-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /* ============================================================
    TÍTULO
 ============================================================ */
@@ -99,6 +111,35 @@
   margin-bottom: 2rem;
   letter-spacing: 1px;
   text-shadow: 0 0 12px rgba(215,185,140,0.3);
+}
+
+.mode-switch {
+  display: inline-flex;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.06);
+  padding: 0.4rem;
+  border-radius: 10px;
+  border: 1px solid rgba(215,185,140,0.2);
+
+  button {
+    border: none;
+    background: transparent;
+    color: var(--texto-suave);
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+
+    &.active {
+      background: linear-gradient(135deg, rgba(215,185,140,0.25), rgba(194,161,117,0.35));
+      color: var(--texto-claro);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+    }
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
 }
 
 /* ============================================================
@@ -133,6 +174,16 @@ input {
   }
 }
 
+.dual-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ============================================================
    BOTÓN PREMIUM
 ============================================================ */
@@ -160,5 +211,37 @@ input {
     box-shadow:
       0 12px 28px rgba(215,185,140,0.55),
       0 0 40px rgba(215,185,140,0.38);
+  }
+}
+
+.feedback {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(215,185,140,0.25);
+
+  .error {
+    color: #ffb4b4;
+    margin: 0;
+  }
+
+  .success {
+    color: #c6e3c1;
+    margin: 0;
+  }
+}
+
+.me-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--cafe-dorado);
+  text-align: center;
+  width: 100%;
+  text-decoration: none;
+  transition: var(--transition);
+
+  &:hover {
+    color: var(--texto-claro);
   }
 }
