@@ -1,0 +1,56 @@
+# Archivos de configuración local
+/.angular/cache
+/.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Dependencias
+/node_modules
+/.pnp
+.pnp.*
+
+# Entornos de compilación
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Archivos de entorno
+/src/environments/environment.ts
+/src/environments/environment.prod.ts
+*.local
+
+# Archivos de caché
+.cache/
+.parcel-cache/
+.eslintcache
+.angular/cache
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDEs y editores
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archivos de cobertura
+/coverage
+
+# Archivos de configuración de herramientas
+.vercel
+.netlify
+.env
+.env.*
+!.env.example
+
+# Archivos de paquetes
+*.tgz

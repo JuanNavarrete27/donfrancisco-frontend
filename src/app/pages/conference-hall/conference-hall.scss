@@ -1,0 +1,271 @@
+/* ============================================================
+   PALETA PREMIUM CAFÉ — Don Francisco
+============================================================ */
+:root {
+  --cafe-bg-1: #2c1810;
+  --cafe-bg-2: #3d241a;
+  --cafe-text: #f5e6d3;
+  --cafe-accent: #d7b98c;       /* dorado cálido */
+  --cafe-accent-dark: #c2a175; /* dorado más profundo */
+  --cafe-muted: #c7b7a3;
+
+  --shadow-soft: 0 10px 25px rgba(0,0,0,0.25);
+  --shadow-deep: 0 18px 40px rgba(0,0,0,0.45);
+
+  --transition: 0.35s ease;
+  --transition-fast: 0.18s ease;
+
+  --radius: 14px;
+}
+
+/* ============================================================
+   HERO DEL SALÓN (FONDO salonconf.jpg)
+============================================================ */
+.hall-hero {
+  position: relative;
+  height: 55vh;
+  background-image: url('/images/salaconf.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--cafe-text);
+
+  /* 🔥 Overlay premium */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(44,24,16,0.75),
+      rgba(44,24,16,0.90)
+    );
+    backdrop-filter: blur(2px);
+    z-index: 1;
+  }
+
+  /* 🔥 Contenido del hero */
+  .hall-hero__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 750px;
+    padding: 1rem 2rem;
+    animation: fadeInZoom 1s ease forwards;
+
+    .hall-hero__title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--cafe-accent);
+      text-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      margin-bottom: 1rem;
+    }
+
+    .hall-hero__subtitle {
+      font-size: 1.3rem;
+      color: var(--cafe-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+  }
+}
+
+/* Animación hero */
+@keyframes fadeInZoom {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================
+   SECCIÓN PRINCIPAL
+============================================================ */
+.hall {
+  padding: 5rem 0;
+  width: min(1200px, 92%);
+  margin: 0 auto;
+  color: var(--cafe-text);
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.hall__header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+
+  .hall__title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--cafe-accent);
+    text-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    margin-bottom: 0.5rem;
+  }
+
+  .hall__subtitle {
+    font-size: 1.2rem;
+    color: var(--cafe-muted);
+  }
+}
+
+/* ============================================================
+   SELECTOR DE FECHA
+============================================================ */
+.hall__fecha {
+  margin-bottom: 3rem;
+  text-align: center;
+
+  .hall__fecha-label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+    color: var(--cafe-accent);
+  }
+
+  .hall__fecha-input {
+    padding: 0.8rem 1.2rem;
+    background: #1f120c;
+    border: 2px solid var(--cafe-accent);
+    color: var(--cafe-text);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: var(--transition);
+
+    &:hover {
+      border-color: var(--cafe-accent-dark);
+    }
+
+    &:focus {
+      outline: none;
+      background: #24150d;
+      box-shadow: 0 0 10px rgba(215,185,140,0.5);
+    }
+  }
+}
+
+/* ============================================================
+   HORARIOS
+============================================================ */
+.horarios-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--cafe-accent);
+  margin-bottom: 1.8rem;
+  text-align: center;
+}
+
+.horarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.4rem;
+}
+
+/* ============================================================
+   HORARIO CARD
+============================================================ */
+.horario-card {
+  background: var(--cafe-bg-2);
+  padding: 1.6rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-deep);
+  }
+
+  &.ocupado {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+      box-shadow: var(--shadow-soft);
+    }
+  }
+}
+
+.horario-hora {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--cafe-accent);
+  margin-bottom: 0.4rem;
+}
+
+.horario-estado {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+
+  &.disponible {
+    color: #4dff93;
+  }
+
+  &.no-disponible {
+    color: #ff6f6f;
+  }
+}
+
+.horario-btn {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: var(--cafe-accent);
+  border: none;
+  color: #2b1a11;
+  font-weight: 700;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  &:hover {
+    background: var(--cafe-accent-dark);
+    transform: translateY(-3px);
+  }
+}
+
+/* TAG OCUPADO */
+.horario-ocupado-tag {
+  background: rgba(255, 80, 80, 0.15);
+  color: #ff6f6f;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  .hall__title {
+    font-size: 2.2rem;
+  }
+
+  .horarios-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .hall__title {
+    font-size: 1.9rem;
+  }
+
+  .hall__subtitle {
+    font-size: 1rem;
+  }
+}

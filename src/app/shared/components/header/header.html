@@ -1,0 +1,85 @@
+<header class="header" [class.scrolled]="isScrolled">
+  <div class="container">
+    <div class="header__content">
+
+      <!-- LOGO -->
+      <a routerLink="/inicio" class="header__logo" #logoElement>
+        <img 
+          [src]="logoPath"
+          alt="Don Francisco"
+          (error)="handleImageError($event)"
+        />
+      </a>
+
+      <!-- NAV DESKTOP -->
+      <nav class="nav">
+        <ul class="nav__list" #navLinks>
+          <li *ngFor="let item of navItems">
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              {{ item.label }}
+            </a>
+          </li>
+        </ul>
+
+        <!-- BOTÓN PREMIUM -->
+        <a 
+          routerLink="/perfil"
+          class="btn-square"
+          (click)="closeMenu()"
+        >
+          Iniciar Sesión
+        </a>
+      </nav>
+
+      <!-- HAMBURGER BUTTON -->
+      <button
+        #navToggle
+        class="hamburger"
+        [class.active]="isMenuOpen"
+        (click)="toggleMenu($event)"
+        aria-label="Menú"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" [class.active]="isMenuOpen">
+
+    <!-- BOTÓN CERRAR -->
+    <button class="close-btn" (click)="closeMenu()" aria-label="Cerrar menú">
+      ✕
+    </button>
+
+    <ul class="mobile-menu__list">
+      <li *ngFor="let item of navItems">
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          {{ item.label }}
+        </a>
+      </li>
+    </ul>
+
+    <!-- BOTÓN MOBILE -->
+    <a 
+      routerLink="/perfil"
+      class="btn-square mobile"
+      (click)="closeMenu()"
+    >
+      Iniciar Sesión
+    </a>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="overlay" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+</header>

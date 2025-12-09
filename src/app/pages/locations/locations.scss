@@ -1,0 +1,286 @@
+/* =============================================================
+   HERO FULLSCREEN ÉPICO
+   Cinematic + Parallax + Deep Glow
+============================================================= */
+
+:host {
+  display: block;
+}
+
+/* Ocupa toda la pantalla sin dejar espacio */
+.locations-hero {
+  height: calc(100vh - 130px);
+  margin-top: -85px;
+  width: 100%;
+  position: relative;
+  margin-bottom: -90px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+
+  padding: 2rem 4rem;
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at top left, rgba(215,185,140,0.25), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(0,0,0,0.92), #020202),
+    #020202;
+}
+
+/* =============================================================
+   TEXTO
+============================================================= */
+
+.hero-text {
+  max-width: 540px;
+  z-index: 5;
+
+  opacity: 0;
+  transform: translateY(60px) scale(0.96);
+  filter: blur(4px);
+}
+
+.badge {
+  padding: 0.55rem 1.2rem;
+  border: 1px solid rgba(215,185,140,0.6);
+  background: rgba(22,22,22,0.75);
+  border-radius: 999px;
+  text-transform: uppercase;
+  color: #f8f3e7;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
+.hero-title {
+  margin: 1.5rem 0 1rem;
+  font-size: 3.3rem;
+  line-height: 1.05;
+  color: #fff4db;
+  filter: drop-shadow(0 0 30px rgba(215,185,140,0.35));
+}
+
+.hero-subtitle {
+  color: rgba(245,238,226,0.82);
+  font-size: 1.1rem;
+  line-height: 1.65;
+  max-width: 470px;
+}
+
+/* =============================================================
+   IMAGEN HERO — AHORA *ENORME* FULL POWER
+============================================================= */
+
+.hero-image-wrapper {
+  flex: 1;
+  height: 100%;
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform-style: preserve-3d;
+
+  opacity: 0;
+  transform: translateY(80px) scale(0.85) rotateX(6deg);
+  filter: blur(6px);
+}
+
+.hero-image {
+  width: 100%;
+  height: 95%; /* AHORA ES ENORME */
+  max-height: 95vh;
+  object-fit: contain;
+
+  border-radius: 26px;
+
+  box-shadow:
+    0 35px 90px rgba(0,0,0,0.9),
+    0 0 120px rgba(215,185,140,0.65),
+    inset 0 0 40px rgba(0,0,0,0.65);
+
+  transition:
+    transform 1.1s cubic-bezier(0.19,1,0.22,1),
+    filter 0.9s ease,
+    box-shadow 1.2s ease;
+}
+
+/* Hover 3D real */
+.hero-image-wrapper:hover .hero-image {
+  transform: scale(1.08) translateZ(40px) rotateX(1deg);
+  box-shadow:
+    0 45px 120px rgba(0,0,0,1),
+    0 0 160px rgba(215,185,140,0.9);
+}
+
+/* Glow profundo */
+.hero-image-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 70%, rgba(215,185,140,0.55), transparent 70%);
+  filter: blur(90px);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* =============================================================
+   ANIMACIÓN CINEMÁTICA DE ENTRADA
+============================================================= */
+
+:host.is-loaded .hero-text {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+  transition:
+    opacity 0.9s ease,
+    filter 0.9s ease,
+    transform 1.15s cubic-bezier(0.19,1,0.22,1);
+}
+
+:host.is-loaded .hero-image-wrapper {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) scale(1) rotateX(0deg);
+  transition:
+    opacity 1s ease 0.1s,
+    filter 1.2s ease 0.1s,
+    transform 1.35s cubic-bezier(0.19,1,0.22,1) 0.1s;
+}
+
+/* =============================================================
+   RESPONSIVE ORIGINAL
+============================================================= */
+
+@media (max-width: 900px) {
+  .locations-hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem 1rem;
+  }
+
+  .hero-image-wrapper {
+    height: 65%;
+  }
+
+  .hero-image {
+    height: 100%;
+    width: 100%;
+  }
+
+  .hero-title {
+    font-size: 2.4rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-image-wrapper {
+    height: 60%;
+  }
+
+  .hero-image {
+    border-radius: 18px;
+  }
+}
+
+/* =============================================================
+   RESPONSIVE FIX DEFINITIVO — ANIMACIONES ACTIVAS
+============================================================= */
+
+@media (max-width: 900px) {
+
+  /* NO tocamos padding ni gaps */
+  .locations-hero {
+    height: auto;
+    margin-top: -45px;
+  }
+
+  /* ✨ Permitimos que las animaciones se ejecuten */
+  .hero-text {
+    max-width: 95%;
+    margin: 0 auto;
+    transform: translateY(25px) scale(0.96);
+    opacity: 0;
+    filter: blur(4px);
+  }
+
+  .hero-subtitle {
+    max-width: 95%;
+  }
+
+  /* ✨ Imagen también entra animada */
+  .hero-image-wrapper {
+    width: 100%;
+    height: auto;
+    transform: translateY(35px) scale(0.92);
+    opacity: 0;
+    filter: blur(6px);
+    margin-top: 1rem;
+  }
+
+  .hero-image {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    border-radius: 20px;
+  }
+
+  /* Cuando entra la clase .is-loaded, animamos igual que desktop */
+  :host.is-loaded .hero-text {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+
+  :host.is-loaded .hero-image-wrapper {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* =============================================================
+   MODAL FULLSCREEN
+============================================================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-image {
+  width: 100%;
+  max-width: 1100px;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 0 40px rgba(215,185,140,0.4),
+              0 25px 100px rgba(0,0,0,1);
+}
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* 🔥 Se ajusta a toda la box */
+  object-position: center;  /* Centra el plano */
+
+  border-radius: 26px;
+
+  box-shadow:
+    0 35px 90px rgba(0,0,0,0.9),
+    0 0 120px rgba(215,185,140,0.65),
+    inset 0 0 40px rgba(0,0,0,0.45);
+
+  transition:
+    transform 1.1s cubic-bezier(0.19,1,0.22,1),
+    filter 0.9s ease,
+    box-shadow 1.2s ease;
+}

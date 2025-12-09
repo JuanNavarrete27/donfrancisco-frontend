@@ -1,0 +1,38 @@
+<main class="locations-hero">
+
+  <div class="hero-text">
+    <span class="badge">Próximamente</span>
+
+    <h1 class="hero-title">¿Qué te ofrecemos?</h1>
+
+    <p class="hero-subtitle">
+      Te mostramos un adelanto del Mercado Don Francisco. Un espacio gastronómico,
+      cultural y social en plena transformación. Mientras preparamos los últimos
+      detalles, descubrí el plano general del interior.
+    </p>
+  </div>
+
+  <!-- Hero Image -->
+  <div 
+    class="hero-image-wrapper"
+    (click)="abrirModal()"
+    [style.transform]="
+      'translate3d('+
+      mouseX * 1.5 + 'px,' + 
+      mouseY * 1.5 + 'px, 0)'
+    "
+  >
+    <div class="hero-image-glow"></div>
+    <img src="/images/plano.png" class="hero-image" alt="Plano del Mercado Don Francisco" />
+  </div>
+
+</main>
+
+<!-- MODAL FULLSCREEN -->
+<div 
+  class="modal-backdrop" 
+  *ngIf="modalOpen"
+  (click)="cerrarModal()"
+>
+  <img src="/images/plano.png" class="modal-image">
+</div>

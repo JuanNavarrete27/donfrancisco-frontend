@@ -1,0 +1,128 @@
+<!-- home.html -->
+
+<section
+  #heroSection
+  class="hero"
+  [style.backgroundImage]="'url(/images/hero.jpg)'"
+>
+  <div class="hero__overlay"></div>
+
+  <div class="hero__inner hero-content">
+    <div class="hero__text" #animateOnScroll>
+      <p class="hero__eyebrow">Próximamente en Melo</p>
+
+      <h1 class="hero__title">Mercado Don Francisco</h1>
+
+      <p class="hero__desc">{{ resumenHero }}</p>
+
+      <div class="hero__cta">
+        <a href="#elproyecto" class="btn-hero">Conocer el mercado</a>
+        <a href="/contacto" target="_blank" class="btn-hero btn-hero--outline">
+          Quiero participar
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__stats" #animateOnScroll>
+      <div class="hero-stat">
+        <span class="hero-stat__number">+80</span>
+        <span class="hero-stat__label">Empleos directos</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__number">21,5M</span>
+        <span class="hero-stat__label">Inversión total</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__number">2026</span>
+        <span class="hero-stat__label">Apertura prevista</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =========================================================
+     INFO GENERAL
+========================================================= -->
+<section #infoSection class="info">
+  <div class="container">
+    <h2 class="section-title" #animateOnScroll>Información general</h2>
+
+    <ul class="info__list">
+      <li *ngFor="let dato of infoGeneral" class="info-item" #animateOnScroll>
+        <i class="fas fa-chevron-right info__icon"></i>
+        <span>{{ dato }}</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- =========================================================
+     FEATURES / CARDS
+========================================================= -->
+<a id="elproyecto"></a>
+
+<section #featuresSection class="features">
+  <div class="container">
+    <h2 class="section-title" #animateOnScroll>El proyecto</h2>
+
+    <div class="cards__grid">
+      <article
+        class="card feature-card"
+        *ngFor="let item of secciones; let i = index"
+        [class.feature-card--left]="i % 2 === 0"
+        [class.feature-card--right]="i % 2 !== 0"
+        #animateOnScroll
+      >
+        <div class="card__inner">
+          <h3 class="card__title">{{ item.titulo }}</h3>
+          <p class="card__text">{{ item.contenido }}</p>
+
+          <!-- ABRE EL MODAL REAL -->
+          <button class="card__link" (click)="abrirModal(item)">
+            Ver detalle
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     ARTÍCULO LARGO
+========================================================= -->
+<section class="articulo">
+  <div class="container">
+    <h2 class="section-title" #animateOnScroll>Historia y avance de la obra</h2>
+
+    <div class="articulo__content">
+      <p class="articulo__texto" #animateOnScroll [innerHTML]="articuloCompleto"></p>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- =========================================================
+     MODAL ANGULAR (FUNCIONAL)
+========================================================= -->
+<div class="modal-overlay" *ngIf="modalAbierto">
+
+  <div class="modal-angular">
+    <button class="modal-close" (click)="cerrarModal()">✕</button>
+
+    <h3 class="modal-title">{{ modalItem?.titulo }}</h3>
+
+    <img
+      *ngIf="modalItem?.imagen"
+      class="modal-img"
+      [src]="modalItem?.imagen"
+      alt="Imagen"
+    />
+
+    <p class="modal-text">
+      {{ modalItem?.contenido }}
+    </p>
+  </div>
+
+</div>
