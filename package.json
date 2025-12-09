@@ -5,8 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --configuration production",
-    "watch": "ng build --watch --configuration development",
-    "serve:ssr:don-francisco": "node dist/don-francisco/server/server.mjs"
+    "watch": "ng build --watch --configuration development"
   },
   "prettier": {
     "printWidth": 100,
