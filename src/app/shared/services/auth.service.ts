@@ -34,6 +34,7 @@ export class AuthService {
     const globalEnv = (import.meta as any)?.env || {};
     const rawUrl =
       globalEnv['NG_APP_API_URL'] || 'https://donfrancisco-backend.onrender.com';
+    const rawUrl = globalEnv['NG_APP_API_URL'] || 'https://donfrancisco-backend-production.up.railway.app';
     this.apiUrl = String(rawUrl).replace(/\/$/, '');
 
     this.userSubject = new BehaviorSubject<AuthUser | null>(this.getStoredUser());
