@@ -1,0 +1,76 @@
+<div class="perfil-background">
+  <div class="perfil-sparks"></div>
+
+  <div class="perfil-container">
+    <header class="perfil-header">
+      <div>
+        <p class="eyebrow">Accediste como</p>
+        <h1 class="perfil-title">{{ user?.nombre }} {{ user?.apellido }}</h1>
+        <p class="subtitle">{{ user?.email }}</p>
+      </div>
+
+      <button class="ghost-button" type="button" (click)="logout()">
+        Cerrar sesión
+      </button>
+    </header>
+
+    <section class="info-card" *ngIf="user">
+      <div class="info-row">
+        <span class="label">Nombre y apellido</span>
+        <strong>{{ user.nombre }} {{ user.apellido }}</strong>
+      </div>
+      <div class="info-row">
+        <span class="label">Correo</span>
+        <strong>{{ user.email }}</strong>
+      </div>
+    </section>
+
+    <section class="password-card">
+      <header>
+        <div>
+          <p class="eyebrow">Seguridad</p>
+          <h2>Cambiar contraseña</h2>
+        </div>
+        <span class="pill" [class.active]="loadingPassword">{{ loadingPassword ? 'Procesando' : 'Activa' }}</span>
+      </header>
+
+      <form class="password-grid" (ngSubmit)="onChangePassword()">
+        <div class="form-group">
+          <label for="currentPassword">Contraseña actual</label>
+          <input
+            type="password"
+            id="currentPassword"
+            name="currentPassword"
+            [(ngModel)]="currentPassword"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">Nueva contraseña</label>
+          <input type="password" id="newPassword" name="newPassword" [(ngModel)]="newPassword" required />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Repetir nueva contraseña</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            required
+          />
+        </div>
+
+        <div class="feedback" *ngIf="errorMessage || successMessage">
+          <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+          <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+        </div>
+
+        <button type="submit" class="login-button" [disabled]="loadingPassword">
+          {{ loadingPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
+        </button>
+      </form>
+    </section>
+  </div>
+</div>
