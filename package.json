@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production && ng run don-francisco:prerender",
+    "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "serve:ssr:don-francisco": "node dist/don-francisco/server/server.mjs"
   },
