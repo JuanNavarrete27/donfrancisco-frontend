@@ -3,7 +3,9 @@
   publish = "dist/don-francisco/browser"
 
 [[plugins]]
-  package = "@netlify/angular-runtime"
+  # Angular 19 SSR requires runtime v2.2.0+; pin it so Netlify installs the
+  # compatible version during the build.
+  package = "@netlify/angular-runtime@2.2.0"
 
 [[redirects]]
   from = "/*"
