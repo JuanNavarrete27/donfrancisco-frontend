@@ -36,8 +36,13 @@ export const routes: Routes = [
     title: 'Noticias - Don Francisco'
   },
 
-  { 
-    path: 'perfil', 
+  {
+    path: 'perfil/me',
+    loadComponent: () => import('./pages/perfil-me/perfil-me.component').then(m => m.PerfilMeComponent),
+    title: 'Mi Perfil - Don Francisco'
+  },
+  {
+    path: 'perfil',
     loadComponent: () => import('./pages/perfil/perfil.component').then(m => m.PerfilComponent),
     title: 'Iniciar Sesión - Don Francisco'
   },
