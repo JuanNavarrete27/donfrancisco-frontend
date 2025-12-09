@@ -1,0 +1,13 @@
+{
+  "routes": {
+    "/": {},
+    "/contacto": {},
+    "/eventos": {},
+    "/gastronomia": {},
+    "/inicio": {},
+    "/locales": {},
+    "/noticias": {},
+    "/perfil": {},
+    "/salon": {}
+  }
+}
