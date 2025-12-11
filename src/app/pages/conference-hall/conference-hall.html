@@ -1,0 +1,56 @@
+<section class="hall" #anim>
+  <div class="hall__header" #anim>
+    <h1 class="hall__title">Salón de Conferencias</h1>
+    <p class="hall__subtitle">
+      Agenda tu evento en nuestro espacio premium.
+    </p>
+  </div>
+
+  <!-- Selector de fecha -->
+  <div class="hall__fecha" #anim>
+    <label for="fecha" class="hall__fecha-label">Seleccionar fecha</label>
+    <input
+      type="date"
+      id="fecha"
+      [value]="fechaSeleccionada"
+      (change)="cambiarFecha($event)"
+      class="hall__fecha-input"
+    />
+  </div>
+
+  <!-- Horarios -->
+  <div class="horarios-container" #anim>
+    <h2 class="horarios-title">Disponibilidad</h2>
+
+    <div class="horarios-grid">
+      <div
+        class="horario-card"
+        *ngFor="let h of horarios"
+        [class.ocupado]="!h.disponible"
+        (click)="reservar(h)"
+        #anim
+      >
+        <div class="horario-hora">{{ h.hora }}</div>
+
+        <div
+          class="horario-estado"
+          [class.disponible]="h.disponible"
+          [class.no-disponible]="!h.disponible"
+        >
+          {{ h.disponible ? 'Disponible' : 'Ocupado' }}
+        </div>
+
+        <button
+          *ngIf="h.disponible"
+          class="horario-btn"
+        >
+          Reservar
+        </button>
+
+        <div *ngIf="!h.disponible" class="horario-ocupado-tag">
+          Reservado
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

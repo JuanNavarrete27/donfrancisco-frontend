@@ -1,0 +1,116 @@
+<div class="perfil-background">
+  <div class="perfil-sparks"></div>
+
+  <div class="perfil-container">
+    <div class="perfil-header">
+      <h1 class="perfil-title">
+        {{ isRegisterMode ? 'Crear cuenta' : 'Iniciar sesión' }}
+      </h1>
+
+      <div class="mode-switch">
+        <button
+          type="button"
+          [class.active]="!isRegisterMode"
+          (click)="toggleMode(false)"
+        >
+          Ingresar
+        </button>
+
+        <button
+          type="button"
+          [class.active]="isRegisterMode"
+          (click)="toggleMode(true)"
+        >
+          Registrarme
+        </button>
+      </div>
+    </div>
+
+    <form class="login-form" (ngSubmit)="onSubmit()" autocomplete="on">
+      <!-- Registro: nombre y apellido -->
+      <div class="dual-row" *ngIf="isRegisterMode">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            [(ngModel)]="nombre"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellido</label>
+          <input
+            type="text"
+            id="apellido"
+            name="apellido"
+            [(ngModel)]="apellido"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="email"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <!-- Password -->
+      <div class="dual-row">
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <div class="form-group" *ngIf="isRegisterMode">
+          <label for="confirmPassword">Repetir contraseña</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback" *ngIf="errorMessage || successMessage">
+        <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+      </div>
+
+      <!-- Botón principal -->
+      <button type="submit" class="login-button" [disabled]="loading">
+        {{ loading ? 'Procesando...' : (isRegisterMode ? 'Crear cuenta' : 'Iniciar sesión') }}
+      </button>
+
+      <!-- Link perfil -->
+      <a
+        class="me-link"
+        routerLink="/perfil/me"
+        *ngIf="authService.isAuthenticated()"
+      >
+        Ya tengo sesión iniciada · Ir a mi perfil
+      </a>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,187 @@
+/* ============================================================
+   PALETA PREMIUM CAFÉ
+============================================================ */
+:host {
+  --cafe-bg-1: #2c1810;
+  --cafe-bg-2: #3d241a;
+  --cafe-text: #f5e6d3;
+  --cafe-accent: #d7b98c;
+  --cafe-accent-dark: #c2a175;
+
+  --transition: 0.6s ease;
+  --transition-fast: 0.35s ease;
+  --shadow-glow:
+    0 0 35px rgba(215,185,140,0.45),
+    0 0 80px rgba(215,185,140,0.35),
+    0 0 140px rgba(215,185,140,0.20);
+
+  display: block;
+}
+
+
+
+/* ============================================================
+   CONTENEDOR GLOBAL
+============================================================ */
+.gastronomy-page {
+  height: calc(100vh - 130px);
+  padding: 2rem 1.5rem;
+  margin-top: -85px;
+  margin-bottom: -45px !important;
+
+  background: linear-gradient(135deg, var(--cafe-bg-1), var(--cafe-bg-2));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+
+
+/* ============================================================
+   BANNER / LOGO DON FRANCISCO (Glow fijo)
+============================================================ */
+.logo-wrapper {
+  width: 30%;
+  max-width: 950px;
+  margin-bottom: -15px;
+
+  opacity: 0;
+  transform: scale(0.8) translateY(40px);
+  filter: blur(6px);
+  animation: fadeInBanner 1.4s ease forwards;
+
+  /* 🔥 IMPORTANTE para permitir al glow expandirse */
+  overflow: visible !important;
+  position: relative;
+}
+
+/* 🇺🇾 Glow dorado premium corregido */
+.banner-logo {
+  width: 65%;                /* 🔥 antes 40%, muy chico → no brillaba */
+  max-width: 600px;          /* tamaño razonable */
+  margin: 0 auto;
+  display: block;
+
+  object-fit: contain;
+
+  /* Glow real */
+  filter:
+    drop-shadow(0 0 20px rgba(215,185,140,0.45))
+    drop-shadow(0 0 55px rgba(215,185,140,0.35))
+    drop-shadow(0 0 95px rgba(215,185,140,0.20));
+
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+}
+
+/* Hover dorado */
+.banner-logo:hover {
+  transform: scale(1.06);
+  filter:
+    drop-shadow(0 0 35px rgba(215,185,140,0.7))
+    drop-shadow(0 0 80px rgba(215,185,140,0.55))
+    drop-shadow(0 0 140px rgba(215,185,140,0.45))
+    drop-shadow(0 0 190px rgba(215,185,140,0.35)); /* extra glow */
+}
+
+/* ✨ Glow adicional (aura suave) */
+.logo-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 55%;
+  height: 55%;
+  border-radius: 50%;
+  z-index: -1;
+
+  background: radial-gradient(
+    circle,
+    rgba(215,185,140,0.35),
+    rgba(215,185,140,0.05),
+    transparent 70%
+  );
+
+  filter: blur(60px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+
+/* ============================================================
+   TEXTO "PRÓXIMAMENTE"
+============================================================ */
+.coming-soon {
+  color: var(--cafe-accent);
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+
+  opacity: 0;
+  transform: translateY(35px);
+  filter: blur(5px);
+  animation: fadeInText 1.4s ease forwards 0.3s;
+}
+
+
+
+/* ============================================================
+   ANIMACIONES
+============================================================ */
+@keyframes fadeInBanner {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(40px);
+    filter: blur(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(35px);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 900px) {
+  .logo-wrapper {
+    width: 82%;
+  }
+.gastronomy-page{
+    margin-top: -50px;
+}
+  .coming-soon {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .logo-wrapper {
+    width: 90%;
+  }
+
+  .coming-soon {
+    font-size: 1.9rem;
+  }
+}

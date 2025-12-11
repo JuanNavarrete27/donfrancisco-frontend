@@ -1,0 +1,151 @@
+<header class="header" [class.scrolled]="isScrolled">
+  <div class="container">
+    <div class="header__content">
+
+      <!-- LOGO -->
+      <a routerLink="/inicio" class="header__logo" #logoElement>
+        <img 
+          [src]="logoPath"
+          alt="Don Francisco"
+          (error)="handleImageError($event)"
+        />
+      </a>
+
+      <!-- NAV DESKTOP -->
+      <nav class="nav">
+        <ul class="nav__list" #navLinks>
+          <li *ngFor="let item of navItems">
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              {{ item.label }}
+            </a>
+          </li>
+        </ul>
+
+        <!-- ====== DESKTOP: BOTONES LOGIN / PERFIL ====== -->
+
+        <!-- SI NO ESTÁ LOGUEADO -->
+        <a 
+          *ngIf="!isLogged"
+          routerLink="/perfil"
+          class="btn-square"
+          (click)="closeMenu()"
+        >
+          Iniciar Sesión
+        </a>
+
+        <!-- SI ESTÁ LOGUEADO: PERFIL -->
+        <a 
+          *ngIf="isLogged"
+          routerLink="/perfil"
+          class="btn-square profile-btn"
+          (click)="closeMenu()"
+        >
+          <!-- Ícono SVG de usuario -->
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="10" cy="6" r="4"></circle>
+            <path d="M2 18c2-4 6-6 8-6s6 2 8 6"></path>
+          </svg>
+          Perfil
+        </a>
+
+        <!-- SI ESTÁ LOGUEADO: CERRAR SESIÓN -->
+        <button 
+          *ngIf="isLogged"
+          class="btn-square logout-btn"
+          (click)="cerrarSesion()"
+        >
+          <!-- Ícono logout -->
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 3H5a2 2 0 0 0-2 2v10a2
+             2 0 0 0 2 2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Salir
+        </button>
+      </nav>
+
+      <!-- HAMBURGER BUTTON -->
+      <button
+        #navToggle
+        class="hamburger"
+        [class.active]="isMenuOpen"
+        (click)="toggleMenu($event)"
+        aria-label="Menú"
+      >
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" [class.active]="isMenuOpen">
+
+    <!-- BOTÓN CERRAR -->
+    <button class="close-btn" (click)="closeMenu()" aria-label="Cerrar menú">
+      ✕
+    </button>
+
+    <ul class="mobile-menu__list">
+      <li *ngFor="let item of navItems">
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+        >
+          {{ item.label }}
+        </a>
+      </li>
+    </ul>
+
+    <!-- ====== MOBILE: LOGIN / PERFIL / LOGOUT ====== -->
+
+    <!-- SI NO ESTÁ LOGUEADO -->
+    <a 
+      *ngIf="!isLogged"
+      routerLink="/perfil"
+      class="btn-square mobile"
+      (click)="closeMenu()"
+    >
+      Iniciar Sesión
+    </a>
+
+    <!-- MOBILE PERFIL -->
+    <a
+      *ngIf="isLogged"
+      routerLink="/perfil"
+      class="btn-square mobile"
+      (click)="closeMenu()"
+    >
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="10" cy="6" r="4"></circle>
+        <path d="M2 18c2-4 6-6 8-6s6 2 8 6"></path>
+      </svg>
+      Perfil
+    </a>
+
+    <!-- MOBILE LOGOUT -->
+    <button
+      *ngIf="isLogged"
+      class="btn-square mobile logout-btn"
+      (click)="cerrarSesion()"
+    >
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 3H5a2 2 0 0 0-2 2v10a2
+         2 0 0 0 2 2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Salir
+    </button>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="overlay" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+</header>
