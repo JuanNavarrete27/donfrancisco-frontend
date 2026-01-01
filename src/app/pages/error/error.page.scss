@@ -1,0 +1,226 @@
+/* ============================================================
+   PALETA PREMIUM CAFÉ — ERROR PAGE
+============================================================ */
+$coffee-0: #120a06;
+$coffee-1: #1a0f0a;
+$coffee-2: #24130c;
+$coffee-3: #2b1810;
+
+$gold: #d7b98c;
+$gold-2: #caa46f;
+
+$text: #f5e6d3;
+$text-soft: rgba(245, 230, 211, 0.78);
+$muted: rgba(245, 230, 211, 0.55);
+
+/* ============================================================
+   BASE
+============================================================ */
+.error-page {
+  margin-top: -85px;
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem 1.2rem;
+
+  display: grid;
+  place-items: center;
+
+  background: radial-gradient(
+    1200px 700px at 30% 15%,
+    $coffee-3 0%,
+    $coffee-1 45%,
+    $coffee-0 100%
+  );
+
+  color: $text;
+  overflow: hidden;
+}
+
+/* ============================================================
+   BACKGROUND FX
+============================================================ */
+.bg-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+
+  background-image:
+    radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px);
+  background-size: 10px 10px;
+
+  animation: grainMove 8s linear infinite;
+}
+
+.bg-glow {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  opacity: .28;
+
+  background:
+    radial-gradient(circle at 35% 20%, rgba(215,185,140,.18), transparent 40%),
+    radial-gradient(circle at 70% 75%, rgba(215,185,140,.10), transparent 45%);
+
+  filter: blur(12px);
+  animation: glowFloat 10s ease-in-out infinite;
+}
+
+/* ============================================================
+   CARD
+============================================================ */
+.error-card {
+  position: relative;
+  z-index: 2;
+
+  width: min(460px, 92vw);
+  padding: 2.1rem 2rem 2.2rem;
+  border-radius: 20px;
+
+  background: linear-gradient(
+    160deg,
+    rgba(43,24,16,.92),
+    rgba(18,10,6,.88)
+  );
+
+  border: 1px solid rgba(215,185,140,.22);
+  box-shadow:
+    0 22px 52px rgba(0,0,0,.65),
+    0 0 0 1px rgba(215,185,140,.12),
+    0 0 38px rgba(215,185,140,.12);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  text-align: center;
+
+  animation: cardIn .6s ease forwards;
+  opacity: 0;
+  transform: translateY(10px) scale(.98);
+}
+
+/* ============================================================
+   LOGO
+============================================================ */
+.logo-wrapper {
+  display: grid;
+  place-items: center;
+  margin-bottom: 1.1rem;
+}
+
+.logo {
+  width: 120px;
+  max-width: 60%;
+  opacity: .95;
+  filter:
+    drop-shadow(0 0 18px rgba(215,185,140,.25));
+}
+
+/* ============================================================
+   TEXTOS
+============================================================ */
+.error-code {
+  font-size: 3.4rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  margin-bottom: .35rem;
+
+  color: $gold;
+  text-shadow:
+    0 0 22px rgba(215,185,140,.35);
+}
+
+.error-title {
+  margin: 0 0 .4rem;
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: .02em;
+  color: $text;
+}
+
+.error-message {
+  margin: 0 0 1.4rem;
+  color: $text-soft;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   BUTTON
+============================================================ */
+.btn {
+  border: none;
+  cursor: pointer;
+
+  border-radius: 14px;
+  padding: .85rem 1.2rem;
+
+  font-weight: 800;
+  letter-spacing: .02em;
+
+  transition:
+    transform .22s ease,
+    box-shadow .22s ease,
+    background .22s ease;
+}
+
+.btn--gold {
+  background: linear-gradient(135deg, $gold, $gold-2);
+  color: $coffee-3;
+
+  box-shadow: 0 14px 30px rgba(215,185,140,.28);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 36px rgba(215,185,140,.38);
+  }
+}
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+@keyframes cardIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes grainMove {
+  0% { transform: translate3d(0,0,0); }
+  100% { transform: translate3d(-20px, 10px, 0); }
+}
+
+@keyframes glowFloat {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 520px) {
+  .error-card {
+    padding: 1.8rem 1.4rem 2rem;
+  }
+
+  .error-code {
+    font-size: 2.9rem;
+  }
+
+  .error-title {
+    font-size: 1.3rem;
+  }
+
+  .error-message {
+    font-size: 1rem;
+  }
+
+  .logo {
+    width: 100px;
+  }
+}
+.error-page {
+  margin-bottom: -35px;
+}

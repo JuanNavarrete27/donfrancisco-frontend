@@ -1,0 +1,140 @@
+<div class="perfil-background">
+  <div class="perfil-sparks"></div>
+
+  <div class="perfil-container">
+
+    <!-- ================= HEADER ================= -->
+    <header class="perfil-header">
+      <div class="perfil-user">
+        <p class="eyebrow">Accediste como</p>
+
+        <h1 class="perfil-title">
+          {{ user?.nombre }} {{ user?.apellido }}
+        </h1>
+
+        <p
+          class="role"
+          [class.admin]="user?.rol === 'admin'"
+        >
+          {{ user?.rol === 'admin' ? 'Administrador' : 'Usuario' }}
+        </p>
+
+        <p class="subtitle">{{ user?.email }}</p>
+      </div>
+    </header>
+
+    <!-- ================= INFO ================= -->
+    <section class="info-card" *ngIf="user">
+      <div class="info-row">
+        <span class="label">Nombre y apellido</span>
+        <strong>{{ user.nombre }} {{ user.apellido }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Correo</span>
+        <strong>{{ user.email }}</strong>
+      </div>
+    </section>
+
+    <!-- ================= SEGURIDAD ================= -->
+    <section class="password-card">
+
+      <button
+        type="button"
+        class="login-button"
+        (click)="openPasswordModal()"
+      >
+        Cambiar contraseña
+      </button>
+
+      <!-- ADMIN -->
+      <a
+        *ngIf="user?.rol === 'admin'"
+        class="login-button admin"
+        routerLink="/admin/editar-noticias"
+      >
+        Editar noticias
+      </a>
+
+    </section>
+  </div>
+</div>
+
+<!-- ================= MODAL PASSWORD (OVERLAY REAL) ================= -->
+<div
+  class="modal-backdrop"
+  *ngIf="showPasswordModal"
+  [class.animating]="modalAnimating"
+  (click)="closePasswordModal()"
+>
+  <div
+    class="modal-card"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-header">
+      <h2>Cambiar contraseña</h2>
+    </header>
+
+    <form (ngSubmit)="onChangePassword()">
+
+      <div class="form-group">
+        <label for="currentPassword">Contraseña actual</label>
+        <input
+          type="password"
+          id="currentPassword"
+          name="currentPassword"
+          [(ngModel)]="currentPassword"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">Nueva contraseña</label>
+        <input
+          type="password"
+          id="newPassword"
+          name="newPassword"
+          [(ngModel)]="newPassword"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Repetir nueva contraseña</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          required
+        />
+      </div>
+
+      <!-- FEEDBACK -->
+      <div class="feedback" *ngIf="errorMessage || successMessage">
+        <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+        <p class="success" *ngIf="successMessage">{{ successMessage }}</p>
+      </div>
+
+      <!-- ACCIONES -->
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="ghost-button"
+          (click)="closePasswordModal()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="login-button"
+          [disabled]="loadingPassword"
+        >
+          {{ loadingPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

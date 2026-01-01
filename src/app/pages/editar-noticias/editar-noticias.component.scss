@@ -1,0 +1,274 @@
+@import '../perfil/perfil.component.scss';
+
+/* ============================================================
+   BASE
+============================================================ */
+:host {
+  display: block;
+}
+
+/* ============================================================
+   PALETA PREMIUM CAFÉ (CLARA)
+============================================================ */
+:host {
+  --cafe-text-main: #4a2e1f;
+  --cafe-text-soft: #6b4a36;
+  --cafe-accent: #b08a5a;
+  --cafe-border: rgba(176, 138, 90, 0.35);
+
+  --bg-main: #ffffff;
+  --bg-soft: #f9f6f2;
+  --bg-card: #ffffff;
+
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 16px 36px rgba(0, 0, 0, 0.12);
+}
+
+/* ============================================================
+   CONTENEDOR GENERAL
+============================================================ */
+.perfil-container {
+  background: linear-gradient(180deg, #ffffff 0%, #faf7f4 100%);
+  border-radius: 20px;
+  padding: 2rem;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.04),
+    0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================================================
+   CARD CONTENEDORA (LISTADO)
+============================================================ */
+.info-card {
+  background: var(--bg-card);
+  padding: 1.6rem 1.8rem;
+  border-radius: 18px;
+  border: 1px solid var(--cafe-border);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ============================================================
+   CARD DE CADA NOTICIA
+============================================================ */
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+
+  background: var(--bg-soft);
+  border: 1px solid var(--cafe-border);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:not(:last-child) {
+    margin-bottom: 0.9rem;
+  }
+
+  &:hover {
+    background: #ffffff;
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+}
+
+/* ============================================================
+   TEXTO
+============================================================ */
+.info-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  cursor: pointer;
+  min-width: 0; /* 🔑 evita overflow */
+
+  .label {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--cafe-text-main);
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  strong {
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    color: var(--cafe-text-soft);
+  }
+}
+
+/* ============================================================
+   ACCIONES (FIX OVERFLOW)
+============================================================ */
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;            /* 🔑 permite salto */
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+/* ============================================================
+   FORMULARIO
+============================================================ */
+.password-card {
+  margin-top: 1.6rem;
+  padding: 2rem 2.2rem;
+
+  background: var(--bg-card);
+  border-radius: 20px;
+  border: 1px solid var(--cafe-border);
+
+  box-shadow: var(--shadow-soft);
+}
+
+/* ============================================================
+   CAMPOS
+============================================================ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.15rem;
+
+  animation: fadeUp 0.3s ease both;
+
+  label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--cafe-text-soft);
+  }
+
+  input,
+  textarea {
+    background: #ffffff;
+    border: 1px solid var(--cafe-border);
+    border-radius: 14px;
+
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    color: var(--cafe-text-main);
+
+    &:focus {
+      outline: none;
+      border-color: var(--cafe-accent);
+      box-shadow: 0 0 0 2px rgba(176, 138, 90, 0.25);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+}
+
+/* ============================================================
+   ACCIONES FORM
+============================================================ */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  flex-wrap: wrap; /* 🔑 mobile */
+}
+
+/* ============================================================
+   BOTONES
+============================================================ */
+
+/* Principal */
+.login-button.admin {
+  background: linear-gradient(135deg, #6b4a36, #4a2e1f);
+  color: #fff;
+  border-radius: 14px;
+  padding: 0.7rem 1.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+  max-width: 100%;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+/* Secundarios */
+.ghost-button {
+  background: transparent;
+  color: var(--cafe-text-main);
+  border: 1px solid var(--cafe-border);
+  border-radius: 14px;
+  padding: 0.6rem 1.1rem;
+  white-space: nowrap;     /* 🔑 */
+  max-width: 100%;         /* 🔑 */
+
+  &:hover {
+    background: rgba(176, 138, 90, 0.08);
+  }
+}
+
+/* Danger */
+.ghost-button.danger {
+  color: #7a2f2f;
+  border-color: rgba(160, 80, 80, 0.45);
+
+  &:hover {
+    background: rgba(160, 80, 80, 0.1);
+  }
+}
+
+/* ============================================================
+   EMPTY / FEEDBACK
+============================================================ */
+.empty {
+  text-align: center;
+  color: var(--cafe-text-soft);
+  padding: 2rem 0;
+}
+
+.success {
+  color: #2f6f4e;
+}
+
+.error {
+  color: #8a2f2f;
+}
+
+/* ============================================================
+   MOBILE FIX
+============================================================ */
+@media (max-width: 640px) {
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .row-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* ============================================================
+   ANIMACIONES
+============================================================ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

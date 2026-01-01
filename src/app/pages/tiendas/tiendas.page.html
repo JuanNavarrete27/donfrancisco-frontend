@@ -1,0 +1,112 @@
+<main class="shops" [style.--sx.%]="sx" [style.--sy.%]="sy">
+
+  <div class="bg" aria-hidden="true">
+    <div class="spot"></div>
+    <div class="lines"></div>
+    <div class="radar"></div>
+    <div class="grain"></div>
+    <div class="scan"></div>
+  </div>
+
+  <header class="top">
+    <a class="back" routerLink="/locales">← Volver</a>
+    <span class="badge">Tiendas</span>
+  </header>
+
+  <section class="hero">
+    <div class="hero__text">
+      <h1 class="title">Puntos de venta premium</h1>
+      <p class="subtitle">
+        Seis espacios para descubrir: selección, regionales, diseño y servicios.
+        Estética <b>holo/blueprint</b> con spotlight (distinto a Gastronomía).
+      </p>
+
+      <div class="search">
+        <span class="search__icon">⌕</span>
+        <input
+          type="text"
+          class="search__input"
+          [value]="query"
+          (input)="setQuery(($any($event.target)).value)"
+          placeholder="Buscar por nombre, tipo o descripción…"
+          aria-label="Buscar tiendas"
+        />
+      </div>
+
+      <div class="filters" role="tablist" aria-label="Filtrar tiendas">
+        <button class="chip" type="button" [class.is-active]="active==='Todos'" (click)="setTipo('Todos')">Todos</button>
+        <button class="chip" type="button" *ngFor="let t of tipos" [class.is-active]="active===t" (click)="setTipo(t)">
+          {{ t }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="list" aria-label="Puntos de venta">
+    <button
+      #cardEl
+      class="card"
+      type="button"
+      *ngFor="let p of filtered; let i = index"
+      (click)="abrir(p)"
+      [attr.data-glow]="p.glow"
+    >
+      <div class="card__fx" aria-hidden="true"></div>
+      <div class="card__edge" aria-hidden="true"></div>
+
+      <div class="card__row">
+        <div class="card__left">
+          <div class="card__top">
+            <span class="pill">{{ p.tipo }}</span>
+            <span class="status" [class.prep]="p.estado==='En preparación'">{{ p.estado }}</span>
+          </div>
+
+          <h2 class="card__title">{{ p.nombre }}</h2>
+          <p class="card__desc">{{ p.resumen }}</p>
+
+          <div class="card__cta">
+            Abrir info <span class="arrow">→</span>
+          </div>
+        </div>
+
+        <div class="card__right">
+          <div class="perks">
+            <span class="perk" *ngFor="let k of p.perks">{{ k }}</span>
+          </div>
+
+          <div class="hint" aria-hidden="true">
+            Spotlight activo • Hover = brillo
+          </div>
+        </div>
+      </div>
+    </button>
+
+    <div class="empty" *ngIf="filtered.length === 0">
+      No encontramos resultados con ese filtro/búsqueda.
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="cerrar()" role="dialog" aria-modal="true">
+  <div class="modal" (click)="stop($event)">
+    <div class="modal__top">
+      <div class="modal__title">{{ selected?.nombre }}</div>
+      <button class="modal__x" type="button" (click)="cerrar()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="modal__body">
+      <div class="modal__meta">
+        <span class="pill">{{ selected?.tipo }}</span>
+        <span class="status" [class.prep]="selected?.estado==='En preparación'">{{ selected?.estado }}</span>
+      </div>
+
+      <p class="modal__text">{{ selected?.detalle }}</p>
+
+      <div class="perks perks--modal">
+        <span class="perk" *ngFor="let k of selected?.perks">{{ k }}</span>
+      </div>
+    </div>
+  </div>
+</div>

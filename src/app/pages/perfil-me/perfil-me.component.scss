@@ -1,0 +1,333 @@
+@import '../perfil/perfil.component.scss';
+
+/* ============================================================
+   CONTENEDOR
+============================================================ */
+.perfil-container {
+  max-width: 780px;
+}
+
+/* ============================================================
+   HEADER PERFIL
+============================================================ */
+.perfil-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  text-align: left;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .eyebrow {
+    color: var(--texto-suave);
+    letter-spacing: 0.8px;
+    margin: 0 0 0.35rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  .subtitle {
+    margin: 0.25rem 0 0;
+    color: var(--texto-suave);
+    word-break: break-word;
+  }
+}
+
+/* ============================================================
+   ROL
+============================================================ */
+.role {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--cafe-dorado);
+}
+
+/* 🔥 ADMIN ROLE */
+.role.admin {
+  color: #ffddb0;
+  text-shadow:
+    0 0 10px rgba(255, 215, 160, 0.6),
+    0 0 22px rgba(215, 185, 140, 0.45);
+}
+
+/* ============================================================
+   TARJETAS
+============================================================ */
+.info-card,
+.password-card {
+  margin-top: 1.5rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(215, 185, 140, 0.18);
+}
+
+/* ============================================================
+   INFO USUARIO
+============================================================ */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    color: var(--texto-suave);
+  }
+
+  strong {
+    color: var(--texto-claro);
+    word-break: break-word;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   SEGURIDAD
+============================================================ */
+.password-card {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+   BOTONES BASE
+============================================================ */
+.ghost-button,
+.login-button {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  height: 44px;
+  padding: 0 1.25rem;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* Ghost */
+.ghost-button {
+  border: 1px solid rgba(215, 185, 140, 0.3);
+  background: transparent;
+  color: var(--texto-claro);
+
+  &:hover {
+    background: rgba(215, 185, 140, 0.15);
+  }
+}
+
+/* ============================================================
+   BOTÓN USUARIO
+============================================================ */
+.login-button {
+  border: none;
+  background: linear-gradient(
+    135deg,
+    var(--cafe-dorado),
+    var(--cafe-dorado-strong)
+  );
+  color: #2c1810;
+  box-shadow:
+    0 6px 20px rgba(215, 185, 140, 0.4),
+    0 0 20px rgba(215, 185, 140, 0.25);
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* ============================================================
+   🔥 BOTÓN ADMIN
+============================================================ */
+.login-button.admin {
+  background: linear-gradient(135deg, #ffddb0, #d7b98c);
+  color: #2c1810;
+
+  box-shadow:
+    0 8px 26px rgba(255, 215, 160, 0.55),
+    0 0 35px rgba(215, 185, 140, 0.45);
+
+  animation: adminPulse 3s ease-in-out infinite;
+}
+
+@keyframes adminPulse {
+  0%   { box-shadow: 0 0 22px rgba(215,185,140,0.35); }
+  50%  { box-shadow: 0 0 38px rgba(255,215,160,0.6); }
+  100% { box-shadow: 0 0 22px rgba(215,185,140,0.35); }
+}
+
+/* ============================================================
+   ================= MODAL PASSWORD =================
+   (NO rompe layout – overlay real)
+============================================================ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(20, 10, 6, 0.75);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 1;
+  transition: opacity 0.25s ease;
+
+  &.animating {
+    opacity: 0;
+  }
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 1.8rem 1.9rem;
+  border-radius: 16px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(60, 35, 22, 0.98),
+    rgba(44, 24, 16, 0.98)
+  );
+
+  border: 1px solid rgba(215, 185, 140, 0.25);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    0 0 40px rgba(215, 185, 140, 0.25);
+
+  transform: translateY(0) scale(1);
+  transition: transform 0.3s ease;
+
+  .modal-header {
+    margin-bottom: 1.3rem;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--texto-claro);
+    }
+  }
+}
+
+/* ============================================================
+   FORM MODAL
+============================================================ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.85rem;
+    color: var(--texto-suave);
+  }
+
+  input {
+    height: 42px;
+    padding: 0 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(215, 185, 140, 0.25);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--texto-claro);
+    outline: none;
+
+    &:focus {
+      border-color: var(--cafe-dorado);
+      box-shadow: 0 0 0 2px rgba(215, 185, 140, 0.25);
+    }
+  }
+}
+
+/* ============================================================
+   FEEDBACK
+============================================================ */
+.feedback {
+  margin: 0.6rem 0;
+
+  .error {
+    color: #ffb4b4;
+  }
+
+  .success {
+    color: #c8f5d0;
+  }
+}
+
+/* ============================================================
+   ACCIONES MODAL
+============================================================ */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+
+  @media (max-width: 420px) {
+    flex-direction: column-reverse;
+  }
+}
+.modal-backdrop {
+  background: rgba(20, 10, 6, 0.6); // antes 0.75
+  backdrop-filter: blur(4px);      // antes 6px
+
+  transition: opacity 0.18s ease;  // MÁS RÁPIDO
+}
+
+
+/* ============================================================
+   FIX MODAL — foco visual + salida rápida
+   (pegar AL FINAL del SCSS)
+============================================================ */
+
+/* Backdrop más liviano */
+.modal-backdrop {
+  background: rgba(20, 10, 6, 0.6);
+  backdrop-filter: blur(4px);
+  transition: opacity 0.18s ease;
+}
+
+/* Estado inicial del modal (entra con foco) */
+.modal-card {
+  transform: translateY(12px) scale(0.97);
+  opacity: 0;
+
+  transition:
+    transform 0.22s ease,
+    opacity 0.18s ease;
+}
+
+/* Modal visible — centro de atención */
+.modal-backdrop:not(.animating) .modal-card {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+/* Salida rápida */
+.modal-backdrop.animating {
+  opacity: 0;
+}
+
+.modal-backdrop.animating .modal-card {
+  transform: translateY(6px) scale(0.98);
+  opacity: 0;
+}

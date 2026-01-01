@@ -1,0 +1,133 @@
+
+<div class="events-page" [class.show]="animarEntrada">
+
+  <!-- =============================
+       HEADER
+  ============================== -->
+  <header class="events-header">
+    <h1 class="title-main">Eventos</h1>
+    <p class="subtitle-main">
+      Próximos encuentros y actividades pasadas del Mercado Don Francisco
+    </p>
+  </header>
+
+  <!-- =============================
+       PRÓXIMOS EVENTOS
+  ============================== -->
+  <section class="event-section">
+    <h2 class="section-title">Próximos eventos</h2>
+
+    <div class="event-grid">
+      <div
+        class="event-card"
+        *ngFor="let evento of eventosProximos"
+        (click)="abrirModal(evento)"
+      >
+        <div class="event-image-wrapper" *ngIf="evento.imagen">
+          <img
+            [src]="evento.imagen"
+            [alt]="evento.titulo"
+            class="event-image"
+          />
+        </div>
+
+        <div class="event-content">
+          <h3 class="event-title">{{ evento.titulo }}</h3>
+          <p class="event-date">
+            {{ evento.fecha | date:'longDate' }}
+          </p>
+          <p class="event-desc">
+            {{ evento.descripcion }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================
+       EVENTOS PASADOS
+  ============================== -->
+  <section class="event-section">
+    <h2 class="section-title">Eventos finalizados</h2>
+
+    <div class="event-grid">
+      <div
+        class="event-card past"
+        *ngFor="let evento of eventosPasados"
+        (click)="abrirModal(evento)"
+      >
+        <div class="event-image-wrapper" *ngIf="evento.imagen">
+          <img
+            [src]="evento.imagen"
+            [alt]="evento.titulo"
+            class="event-image"
+          />
+        </div>
+
+        <div class="event-content">
+          <h3 class="event-title">{{ evento.titulo }}</h3>
+          <p class="event-date">
+            {{ evento.fecha | date:'longDate' }}
+          </p>
+          <p class="event-desc">
+            {{ evento.descripcion }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================
+       MODAL OVERLAY
+  ============================== -->
+  <div
+    class="modal-overlay"
+    *ngIf="modalAbierto"
+    [class.closing]="cerrandoModal"
+    (click)="cerrarModal()"
+  ></div>
+
+  <!-- =============================
+       MODAL CONTENIDO
+  ============================== -->
+  <div class="modal-wrapper" *ngIf="modalAbierto">
+    <div
+      class="modal-content"
+      [class.closing]="cerrandoModal"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        class="modal-close"
+        type="button"
+        (click)="cerrarModal()"
+        aria-label="Cerrar"
+      >
+        &times;
+      </button>
+
+      <h2 class="modal-title">
+        {{ eventoActivo?.titulo }}
+      </h2>
+
+      <p class="modal-date">
+        {{ eventoActivo?.fecha | date:'longDate' }}
+      </p>
+
+      <!-- ✅ VIDEO EN MODAL -->
+      <div class="modal-video-wrapper" *ngIf="eventoActivo?.safeVideoUrl">
+       <iframe
+  [src]="eventoActivo?.safeVideoUrl"
+  frameborder="0"
+  allow="autoplay; clipboard-write; encrypted-media; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+      </div>
+
+      <p class="modal-desc">
+        {{ eventoActivo?.descripcion }}
+      </p>
+    </div>
+  </div>
+
+</div>

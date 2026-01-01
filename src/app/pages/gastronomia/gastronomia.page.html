@@ -1,0 +1,136 @@
+<main class="gastro">
+
+  <!-- BG FX sutil + premium -->
+  <div class="bg" aria-hidden="true">
+    <div class="orb a"></div>
+    <div class="orb b"></div>
+    <div class="steam s1"></div>
+    <div class="steam s2"></div>
+    <div class="grid"></div>
+    <div class="grain"></div>
+    <div class="shine"></div>
+  </div>
+
+  <header class="top">
+    <a class="back" routerLink="/locales">← Volver</a>
+    <span class="badge">Gastronomía</span>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" [style.transform]="'translate3d('+mx+'px,'+my+'px,0)'">
+    <div class="hero__text">
+      <h1 class="title">Sabores que se sienten</h1>
+      <p class="subtitle">
+        Ocho propuestas con estética <b>premium café</b>.
+        Bajá y descubrí cada local: aparecen con una entrada suave y cinematográfica.
+      </p>
+
+      <div class="filters" role="tablist" aria-label="Filtrar gastronomía">
+        <button class="chip" type="button" [class.is-active]="activeTag==='Todos'" (click)="setTag('Todos')">Todos</button>
+        <button class="chip" type="button" *ngFor="let t of tags" [class.is-active]="activeTag===t" (click)="setTag(t)">
+          {{ t }}
+        </button>
+      </div>
+    </div>
+
+    <!-- FEATURED (ancho completo pero compacto) -->
+    <button class="featured" type="button" (click)="abrir(featured)">
+      <div class="featured__fx" aria-hidden="true"></div>
+
+  <!-- <div class="featured__row">
+        <div class="featured__left">
+          <div class="featured__top">
+            <span class="pill">Destacado</span>
+            <span class="status" [class.prep]="featured.estado==='En preparación'">{{ featured.estado }}</span>
+          </div>
+
+          <div class="featured__name">{{ featured.nombre }}</div>
+          <div class="featured__meta">{{ featured.tag }}</div>
+          <p class="featured__desc">{{ featured.resumen }}</p>
+
+          <div class="featured__cta">
+            Abrir detalle <span class="arrow">→</span>
+          </div>
+        </div>
+-->
+        <div class="featured__right" aria-hidden="true">
+          <div class="featured__badge">
+            <div class="dot"></div>
+            Premium café
+          </div>
+          <div class="featured__chips">
+            <span *ngFor="let h of featured.highlight">• {{ h }}</span>
+          </div>
+        </div>
+      
+    </button>
+  </section>
+
+  <!-- LISTA FULL WIDTH -->
+  <section class="list" aria-label="Locales gastronómicos">
+    <button
+      #cardEl
+      class="card"
+      type="button"
+      *ngFor="let l of filtered; let i = index"
+      (click)="abrir(l)"
+      [attr.data-intensity]="l.intensidad"
+      [style.--d]="'0.' + (i+1) + 's'"
+    >
+      <div class="card__fx" aria-hidden="true"></div>
+      <div class="card__sweep" aria-hidden="true"></div>
+
+      <div class="card__row">
+        <div class="card__left">
+          <div class="card__top">
+            <span class="pill">{{ l.tag }}</span>
+            <span class="status" [class.prep]="l.estado==='En preparación'">{{ l.estado }}</span>
+          </div>
+
+          <h2 class="card__title">{{ l.nombre }}</h2>
+          <p class="card__desc">{{ l.resumen }}</p>
+
+          <div class="card__cta">
+            Ver detalle <span class="arrow">→</span>
+          </div>
+        </div>
+
+        <div class="card__right">
+          <div class="kpi">
+            <div class="kpi__label">Highlights</div>
+            <div class="kpi__items">
+              <span class="kpi__item" *ngFor="let h of l.highlight">{{ h }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </button>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" *ngIf="modalOpen" (click)="cerrar()" role="dialog" aria-modal="true">
+  <div class="modal" (click)="stop($event)">
+    <div class="modal__top">
+      <div class="modal__title">{{ selected?.nombre }}</div>
+      <button class="modal__x" type="button" (click)="cerrar()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="modal__body">
+      <div class="modal__meta">
+        <span class="pill">{{ selected?.tag }}</span>
+        <span class="status" [class.prep]="selected?.estado==='En preparación'">{{ selected?.estado }}</span>
+      </div>
+
+      <p class="modal__text">{{ selected?.detalle }}</p>
+
+      <div class="bullets">
+        <div class="bullet" *ngFor="let h of selected?.highlight">
+          <span class="dot"></span>
+          <span>{{ h }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

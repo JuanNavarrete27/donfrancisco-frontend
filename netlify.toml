@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist/don-francisco/browser"
+
+[build.environment]
+  NG_APP_API_URL = "https://donfrancisco-backend.fly.dev/"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,0 +1,401 @@
+<!-- conferencias.page.html -->
+<section class="conf-page">
+
+  <!-- VIDEO BACKGROUND -->
+  <video
+    #bgVideo
+    class="conf-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+  >
+    <source src="/videos/salaconf.mp4" type="video/mp4"/>
+  </video>
+
+  <!-- OVERLAY OSCURO -->
+  <div class="conf-overlay"></div>
+
+  <!-- CONTENIDO CENTRADO -->
+  <div class="conf-center">
+
+    <!-- =====================================================
+         INFO SALÓN (NO MODAL)
+    ====================================================== -->
+    <section class="conf-info">
+
+      <!-- CARD CONOCÉ EL SALÓN -->
+      <div class="salon-card">
+        <div class="salon-card-bg"></div>
+
+        <div class="salon-card-content">
+          <span class="salon-kicker">Salón de conferencias</span>
+          <h2 class="salon-title">CONOCÉ EL SALÓN</h2>
+          <p class="salon-sub">
+            Espacio equipado para charlas, reuniones y eventos corporativos.
+          </p>
+        </div>
+      </div>
+
+      <!-- GALERÍA DE IMÁGENES -->
+      <div class="salon-gallery">
+        <div class="salon-img">
+          <img src="/images/salon-1.jpg" alt="Salón" />
+        </div>
+        <div class="salon-img">
+          <img src="/images/salon-2.jpg" alt="Salón" />
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CARD CTA -->
+    <button
+      class="cta-card"
+      type="button"
+      (click)="abrirAgenda()"
+      aria-label="Agendar hora"
+    >
+      <div class="cta-glow"></div>
+      <div class="cta-content">
+        <span class="cta-kicker">Salón de conferencias</span>
+        <h1 class="cta-title">AGENDAR HORA</h1>
+        <p class="cta-sub">
+          Elegí día y horario en segundos
+        </p>
+      </div>
+      <span class="cta-arrow" aria-hidden="true">→</span>
+    </button>
+
+  </div>
+
+  <!-- =====================================================
+       MODAL AGENDA
+  ====================================================== -->
+  <div
+    class="modal-backdrop"
+    *ngIf="modalAgendaOpen"
+    [class.is-closing]="modalAnimating"
+    (click)="cerrarAgenda()"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Agendar hora"
+      (click)="$event.stopPropagation()"
+      [class.is-closing]="modalAnimating"
+      [class.modal-visible]="modalVisible"
+    >
+      <!-- HEADER -->
+      <div class="modal-header">
+        <div class="modal-title">
+          <span class="badge">Agenda</span>
+          <h2>Reservar horario</h2>
+
+          <p *ngIf="diaSeleccionado" class="modal-date">
+            {{ formatDate(diaSeleccionado) }}
+          </p>
+
+          <!-- ✅ RESUMEN INICIO/FIN (SOLO EN HOURS/FORM) -->
+          <p *ngIf="(step === 'hours' || step === 'form') && tieneBloqueSeleccionado" class="modal-date">
+            Inicio: <strong>{{ horaInicio }}</strong>
+            <span> · Fin: <strong>{{ horaFinCalculada }}</strong></span>
+            <span> ({{ cantidadHorasSeleccionadas }}h)</span>
+          </p>
+        </div>
+
+        <button
+          class="icon-btn"
+          type="button"
+          (click)="cerrarAgenda()"
+          aria-label="Cerrar"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body">
+
+        <!-- =========================
+             STEP: CALENDAR
+        ========================== -->
+        <div class="step step-calendar" *ngIf="step === 'calendar'">
+          <div class="calendar-head">
+            <button
+              class="nav-btn"
+              type="button"
+              (click)="mesAnterior()"
+              [disabled]="esMesActual()"
+              aria-label="Mes anterior"
+            >
+              ‹
+            </button>
+
+            <div class="month-label">
+              <span class="month">{{ meses[mesActual.getMonth()] }}</span>
+              <span class="year">{{ mesActual.getFullYear() }}</span>
+            </div>
+
+            <button
+              class="nav-btn"
+              type="button"
+              (click)="mesSiguiente()"
+              [disabled]="esFuturoLejano()"
+              aria-label="Mes siguiente"
+            >
+              ›
+            </button>
+          </div>
+
+          <div class="weekdays">
+            <span>Do</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span>
+          </div>
+
+          <div class="calendar-grid">
+            <button
+              *ngFor="let d of calendario; trackBy: trackByDate"
+              class="day"
+              type="button"
+              [disabled]="!d || esPasado(d)"
+              [class.is-empty]="!d"
+              [class.is-today]="d && esHoy(d)"
+              [class.is-selected]="d && esDiaSeleccionado(d)"
+              (click)="d && seleccionarDia(d)"
+            >
+              <span *ngIf="d">{{ d.getDate() }}</span>
+            </button>
+          </div>
+
+          <div class="calendar-foot">
+            <p class="hint">
+              Seleccioná un día para ver horarios disponibles.
+            </p>
+          </div>
+        </div>
+
+        <!-- =========================
+             STEP: HOURS
+        ========================== -->
+        <div class="step step-hours" *ngIf="step === 'hours'">
+          <div class="hours-top">
+            <button class="btn btn--ghost" type="button" (click)="volverACalendario()">
+              ← Cambiar día
+            </button>
+
+            <div class="hours-title">
+              <h3>Horarios</h3>
+              <p *ngIf="diaSeleccionado" class="muted">
+                {{ formatDate(diaSeleccionado) }}
+              </p>
+
+              <!-- ✅ AYUDA -->
+              <p class="muted" style="margin-top:.35rem">
+                Tocá una hora para inicio. Luego tocá horas consecutivas para extender hasta la fin.
+              </p>
+            </div>
+          </div>
+
+          <!-- ✅ RESUMEN INICIO / FIN (CLARO) -->
+          <div class="hours-summary" *ngIf="diaSeleccionado">
+            <div class="sum-row">
+              <span class="sum-label">Hora inicio:</span>
+              <span class="sum-value">{{ horaInicio || '—' }}</span>
+            </div>
+
+            <div class="sum-row">
+              <span class="sum-label">Hora fin:</span>
+              <span class="sum-value">{{ tieneBloqueSeleccionado ? horaFinCalculada : '—' }}</span>
+            </div>
+
+            <p class="sum-hint" *ngIf="!tieneBloqueSeleccionado">
+              Elegí una hora para empezar.
+            </p>
+
+            <p class="sum-hint" *ngIf="tieneBloqueSeleccionado">
+              Duración: <strong>{{ cantidadHorasSeleccionadas }}h</strong>
+            </p>
+          </div>
+
+          <div class="hours-grid">
+            <button
+              *ngFor="let h of horariosDisponibles; trackBy: trackByHora"
+              class="hour"
+              type="button"
+              [disabled]="!h.disponible"
+              [class.is-selected]="isHoraSeleccionada(h.hora)"
+              [class.is-disabled]="!h.disponible"
+              (click)="h.disponible && seleccionarHora(h.hora)"
+            >
+              <span class="hour-time">{{ h.hora }}</span>
+
+              <span class="hour-chip" *ngIf="!h.disponible">Ocupado</span>
+              <span class="hour-chip ok" *ngIf="h.disponible">Disponible</span>
+
+              <!-- ✅ chip extra cuando está dentro del bloque -->
+              <span class="hour-chip selected" *ngIf="isHoraSeleccionada(h.hora)">
+                En bloque
+              </span>
+            </button>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn--ghost" type="button" (click)="cerrarAgenda()">
+              Cancelar
+            </button>
+
+            <button
+              class="btn btn--gold"
+              type="button"
+              [disabled]="!tieneBloqueSeleccionado || procesando"
+              (click)="confirmarHora()"
+            >
+              <span *ngIf="!procesando">Confirmar</span>
+              <span *ngIf="procesando">Procesando…</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- =========================
+             STEP: FORM (INVITADO)
+        ========================== -->
+        <div class="step step-form" *ngIf="step === 'form'">
+          <div class="form-top">
+            <div class="form-title">
+              <h3>Datos del solicitante</h3>
+
+              <!-- ✅ muestra inicio/fin seleccionado -->
+              <p class="muted" *ngIf="tieneBloqueSeleccionado">
+                Inicio: <strong>{{ horaInicio }}</strong>
+                <span> · Fin: <strong>{{ horaFinCalculada }}</strong></span>
+                <span> ({{ cantidadHorasSeleccionadas }}h)</span>
+              </p>
+
+              <p class="muted" *ngIf="!tieneBloqueSeleccionado">
+                Completá para confirmar la reserva.
+              </p>
+            </div>
+          </div>
+
+          <form class="form" [formGroup]="reservaForm" (ngSubmit)="confirmarReserva()">
+            <div class="row">
+              <div class="field">
+                <label>Nombre</label>
+                <input type="text" formControlName="nombre" placeholder="Tu nombre" />
+              </div>
+
+              <div class="field">
+                <label>Apellido</label>
+                <input type="text" formControlName="apellido" placeholder="Tu apellido" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field phone">
+                <label>Teléfono</label>
+                <div class="phone-wrap">
+                  <select formControlName="prefijo" class="prefijo-select" aria-label="Prefijo">
+                    <option *ngFor="let p of paises" [value]="p.code">
+                      {{ p.code }} — {{ p.name }}
+                    </option>
+                  </select>
+
+                  <input
+                    class="tel"
+                    type="text"
+                    formControlName="telefono"
+                    placeholder="91234567"
+                  />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Email</label>
+                <input type="email" formControlName="email" placeholder="tu@mail.com" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Mensaje (opcional)</label>
+              <textarea
+                rows="3"
+                formControlName="mensaje"
+                placeholder="Ej: Necesito proyector y 20 sillas..."
+              ></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn--ghost" type="button" (click)="volverAHorarios()">
+                Volver
+              </button>
+
+              <button
+                class="btn btn--gold"
+                type="submit"
+                [disabled]="!reservaForm.valid || procesando"
+              >
+                <span *ngIf="!procesando">Confirmar reserva</span>
+                <span *ngIf="procesando">Procesando…</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- =========================
+     STEP: SUCCESS
+========================== -->
+<div class="step step-success" *ngIf="step === 'success'">
+  <div class="success">
+    <div class="success-icon">✓</div>
+    <h3>RESERVA PENDIENTE</h3>
+
+    <p class="muted">
+      Te avisaremos el estado.
+    </p>
+
+    <p class="muted" *ngIf="diaSeleccionado" style="margin-top:.6rem">
+      Día: <strong>{{ formatDate(diaSeleccionado) }}</strong>
+      <br />
+      Inicio: <strong>{{ horaSeleccionada || '—' }}</strong>
+      <br />
+      Fin: <strong>{{ horaFinCalculada || '—' }}</strong>
+    </p>
+
+    <div class="actions">
+      <button class="btn btn--ghost" type="button" (click)="cerrarAgenda()">
+        Cerrar
+      </button>
+
+      <button class="btn btn--gold" type="button" (click)="agendarOtra()">
+        Agendar otra
+      </button>
+    </div>
+  </div>
+</div>
+
+        <!-- =========================
+             ERROR (global)
+        ========================== -->
+        <div class="inline-error" *ngIf="error">
+          {{ error }}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PROX (apagado a propósito) -->
+  <div class="modal-backdrop" *ngIf="false" (click)="0">
+    <div class="modal modal-prox" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+      <div class="prox-content">
+        <img src="/images/404.png" alt="Don Francisco" class="prox-logo" />
+        <h2>PRÓXIMAMENTE DISPONIBLE</h2>
+        <p>Estamos terminando los últimos detalles del sistema de reservas.</p>
+        <button class="btn btn--gold" type="button" (click)="0">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+</section>

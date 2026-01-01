@@ -1,0 +1,85 @@
+<div class="novedades-background" [class.show]="animarEntrada">
+  <div class="novedades-container">
+
+    <h1 class="title">NOTICIAS</h1>
+
+    <div class="novedades-list">
+      <div 
+        class="novedad-card"
+        *ngFor="let n of novedades"
+        (click)="abrirModal(n)"
+      >
+
+        <!-- Vista previa de imagen -->
+        <div class="novedad-img-wrapper" *ngIf="n.imagen">
+          <img [src]="n.imagen" [alt]="n.titulo" class="novedad-img" />
+        </div>
+
+        <div class="novedad-content">
+          <h2>{{ n.titulo }}</h2>
+          <p class="fecha">{{ n.fecha }}</p>
+          <p class="autor">{{ n.autor }}</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
+     MODAL
+============================================================ -->
+
+<!-- OVERLAY -->
+<div 
+  class="modal-overlay" 
+  *ngIf="modalAbierto"
+  [class.closing]="overlayClosing"
+  (click)="cerrarModal()">
+</div>
+
+<!-- WRAPPER -->
+<div class="modal-wrapper" *ngIf="modalAbierto">
+
+  <!-- CONTENIDO DEL MODAL -->
+  <div class="modal-content">
+
+    <button class="modal-close" (click)="cerrarModal()">✕</button>
+
+    <h2 class="modal-title">{{ novedadActiva?.titulo }}</h2>
+    <p class="modal-fecha">{{ novedadActiva?.fecha }}</p>
+
+    <!-- CONTENIDO SCROLLEABLE -->
+    <div class="modal-scroll">
+
+      <!-- VIDEO -->
+      <div
+        class="modal-video-wrapper"
+        *ngIf="novedadActiva?.safeVideoUrl"
+        [class.active]="videoInteractivo"
+        (click)="activarVideo()"
+      >
+
+        <!-- OVERLAY PARA BLOQUEAR SCROLL / ACTIVAR VIDEO -->
+        <div class="iframe-overlay" *ngIf="!videoInteractivo">
+          <span>▶ Reproducir</span>
+        </div>
+
+        <iframe
+          [src]="novedadActiva?.safeVideoUrl"
+          allowfullscreen>
+        </iframe>
+
+      </div>
+
+      <!-- DESCRIPCIÓN -->
+      <p class="modal-descripcion">
+        {{ novedadActiva?.descripcion }}
+      </p>
+
+    </div>
+
+  </div>
+</div>

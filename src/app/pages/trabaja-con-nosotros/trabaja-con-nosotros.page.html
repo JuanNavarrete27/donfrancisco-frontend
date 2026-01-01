@@ -1,0 +1,256 @@
+<!-- trabaja-con-nosotros.page.html -->
+<section #pageRoot class="tcn-page">
+  <!-- Ambient background layers -->
+  <div class="bg">
+    <div class="bg__glow"></div>
+    <div class="bg__grain"></div>
+    <div class="bg__lines"></div>
+  </div>
+
+  <!-- HERO -->
+  <header #hero class="hero">
+    <div class="hero__inner">
+      <div class="hero__badge" data-anim="hero">
+        <span class="dot"></span>
+        Mercado Don Francisco
+        <span class="sep">•</span>
+        Administración
+      </div>
+
+      <h1 class="hero__title" data-anim="hero">Trabajá con nosotros</h1>
+
+      <p class="hero__subtitle" data-anim="hero">
+        Queremos que el proceso sea simple, claro y rápido.
+        Seguí estos pasos y presentá tu formulario en administración.
+      </p>
+
+      <div class="hero__cta" data-anim="hero">
+        <a class="btn btn--primary" [href]="pdfUrl" download>
+          <span class="btn__icon" aria-hidden="true">↓</span>
+          Descargar PDF
+          <span class="btn__shine" aria-hidden="true"></span>
+        </a>
+
+        <a class="btn btn--ghost" href="#pasos">
+          Ver pasos
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="hero__note" data-anim="hero">
+        <span class="hero__note-ico" aria-hidden="true">i</span>
+        Si el PDF no se descarga automáticamente: clic derecho → “Guardar enlace como…”
+      </div>
+    </div>
+
+    <div class="hero__card" data-anim="hero" aria-hidden="true">
+      <div class="hero__card-top">
+    <!--    <div class="stamp">PREMIUM</div> 
+        <div class="mini">Mercado 1897 SAS</div> -->
+      </div>
+      <div class="hero__card-mid">
+        <div class="line"></div>
+        <div class="pill">Postulación</div>
+      </div>
+      <div class="hero__card-bot">
+        <div class="kpi">
+          <div class="kpi__num">3</div>
+          <div class="kpi__label">Pasos</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__num">1</div>
+          <div class="kpi__label">Formulario</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__num">✓</div>
+          <div class="kpi__label">Listo</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="content">
+    <div class="section-head" id="pasos">
+      <h2 class="section-title">Cómo postular</h2>
+      <p class="section-subtitle">
+        Hacelo en orden para que en administración puedan procesarlo sin demoras.
+      </p>
+    </div>
+
+    <!-- STEPS -->
+    <div #steps class="steps">
+      <!-- Step 1 -->
+      <article class="step-card">
+        <div class="step-card__shine" aria-hidden="true"></div>
+
+        <div class="step-card__top">
+          <div class="step-num">01</div>
+          <div class="step-title">Descargá el archivo PDF</div>
+        </div>
+
+        <p class="step-desc">
+          Descargá el formulario oficial para “Trabajá con nosotros” y guardalo en tu celular o PC.
+        </p>
+
+        <div class="step-actions">
+          <a class="btn btn--primary" [href]="pdfUrl" download>
+            <span class="btn__icon" aria-hidden="true">↓</span>
+            Descargar PDF
+            <span class="btn__shine" aria-hidden="true"></span>
+          </a>
+
+          <div class="hint">
+            <span class="hint__dot" aria-hidden="true"></span>
+            Archivo en formato PDF
+          </div>
+        </div>
+
+        <div class="step-meta">
+          <div class="chip">Recomendado: guardalo en Drive</div>
+          <div class="chip">Completalo con letra clara</div>
+        </div>
+      </article>
+
+      <!-- Step 2 -->
+      <article class="step-card">
+        <div class="step-card__shine" aria-hidden="true"></div>
+
+        <div class="step-card__top">
+          <div class="step-num">02</div>
+          <div class="step-title">Imprimilo y rellenalo</div>
+        </div>
+
+        <p class="step-desc">
+          Imprimí el formulario y completalo con tus datos. Revisá que quede legible y sin tachaduras.
+        </p>
+
+        <ul class="checklist">
+          <li><span class="check">✓</span> Datos personales completos</li>
+          <li><span class="check">✓</span> Experiencia / disponibilidad</li>
+          <li><span class="check">✓</span> Firma al final del formulario</li>
+        </ul>
+
+        <div class="step-actions">
+          <a class="btn btn--ghost" [href]="pdfUrl" target="_blank" rel="noopener">
+            Abrir PDF en otra pestaña
+            <span class="btn__arrow" aria-hidden="true">→</span>
+          </a>
+
+          <div class="hint">
+            <span class="hint__dot" aria-hidden="true"></span>
+            Imprimir en tamaño A4
+          </div>
+        </div>
+
+        <div class="step-meta">
+          <div class="chip">Sin impresora: pedí ayuda en un ciber</div>
+          <div class="chip">Traelo listo para entregar</div>
+        </div>
+      </article>
+
+      <!-- Step 3 -->
+      <article class="step-card step-card--highlight">
+        <div class="step-card__shine" aria-hidden="true"></div>
+
+        <div class="step-card__top">
+          <div class="step-num">03</div>
+          <div class="step-title">Llevalo a Administración</div>
+        </div>
+
+        <p class="step-desc">
+          Entregalo en la oficina de administración de <strong>Mercado Don Francisco</strong>.
+        </p>
+
+        <div class="address">
+          <div class="address__row">
+            <span class="pin" aria-hidden="true">📍</span>
+            <div class="address__text">
+              <div class="address__name">Mercado Don Francisco</div>
+              <div class="address__note">Presentar en administración (en horario de oficina)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn btn--primary" type="button" (click)="abrirMapa()">
+            Ver en Google Maps
+            <span class="btn__arrow" aria-hidden="true">↗</span>
+            <span class="btn__shine" aria-hidden="true"></span>
+          </button>
+
+          <a class="btn btn--ghost" [href]="mapsExternalUrl" target="_blank" rel="noopener">
+            Abrir en Maps
+            <span class="btn__arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="step-meta">
+          <div class="chip chip--gold">Tip: llevá cédula por las dudas</div>
+          <div class="chip">Si vas apurado, llegá 10 min antes</div>
+        </div>
+      </article>
+    </div>
+
+    <!-- Footer note -->
+    <div class="footer-note">
+      <div class="footer-note__icon" aria-hidden="true">☕</div>
+      <div class="footer-note__text">
+        Gracias por querer ser parte del equipo. Si tu postulación queda completa, el proceso es mucho más rápido.
+      </div>
+    </div>
+  </main>
+
+  <!-- MAP MODAL (mounted always; animated via GSAP) -->
+  <div
+    #mapModal
+    class="map-modal"
+    [class.is-open]="modalState === 'open' || modalState === 'opening'"
+    [attr.aria-hidden]="!(modalState === 'open' || modalState === 'opening')"
+  >
+    <div #modalOverlay class="map-modal__overlay" (click)="onOverlayClick()"></div>
+
+    <div
+      #modalCard
+      class="map-modal__card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mapTitle"
+      tabindex="-1"
+    >
+      <div class="map-modal__head">
+        <div class="map-modal__titlewrap">
+          <div id="mapTitle" class="map-modal__title">Mercado Don Francisco</div>
+          <div class="map-modal__subtitle">Ubicación — Administración</div>
+        </div>
+
+        <button class="icon-btn" type="button" (click)="cerrarMapa()" aria-label="Cerrar">
+          ✕
+        </button>
+      </div>
+
+      <div class="map-modal__body">
+        <iframe
+          class="map-embed"
+          [src]="mapsEmbedUrl"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+          title="Mapa — Mercado Don Francisco Shopping Center"
+        ></iframe>
+      </div>
+
+      <div class="map-modal__foot">
+        <a class="btn btn--ghost" [href]="mapsExternalUrl" target="_blank" rel="noopener">
+          Abrir en Google Maps
+          <span class="btn__arrow" aria-hidden="true">→</span>
+        </a>
+
+        <button class="btn btn--primary" type="button" (click)="cerrarMapa()">
+          Listo
+          <span class="btn__shine" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

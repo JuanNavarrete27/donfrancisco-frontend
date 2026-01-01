@@ -1,0 +1,43 @@
+<div class="error-page">
+
+  <!-- Fondo -->
+  <div class="bg-grain"></div>
+  <div class="bg-glow"></div>
+
+  <!-- CARD -->
+  <div class="error-card">
+
+    <!-- LOGO -->
+    <div class="logo-wrapper">
+      <img
+        src="/images/404.png"
+        alt="Don Francisco"
+        class="logo"
+      />
+    </div>
+
+    <!-- CÓDIGO -->
+    <div class="error-code">
+      {{ errorType }}
+    </div>
+
+    <!-- TEXTO -->
+    <h1 class="error-title">
+      {{ title }}
+    </h1>
+
+    <p class="error-message">
+      {{ message }}
+    </p>
+
+    <!-- ACCIÓN -->
+    <button
+      class="btn btn--gold"
+      type="button"
+      (click)="volverInicio()"
+    >
+      Volver al inicio
+    </button>
+
+  </div>
+</div>

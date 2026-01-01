@@ -1,0 +1,74 @@
+<div class="contact-wrapper">
+
+  <!-- Fondo animado de constelaciones -->
+  <canvas class="constelaciones-canvas"></canvas>
+
+  <div class="contact-card">
+    <h1 class="title">Contacto</h1>
+    <p class="subtitle">
+      Dejanos tu mensaje y te respondemos a la brevedad.
+    </p>
+
+    <form (ngSubmit)="onSubmit()" class="contact-form">
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input
+          type="text"
+          id="nombre"
+          [(ngModel)]="nombre"
+          name="nombre"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input
+          type="email"
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          required
+          [disabled]="loading"
+        />
+      </div>
+
+      <!-- Mensaje -->
+      <div class="form-group">
+        <label for="mensaje">Mensaje</label>
+        <textarea
+          id="mensaje"
+          [(ngModel)]="mensaje"
+          name="mensaje"
+          rows="5"
+          required
+          [disabled]="loading"
+        ></textarea>
+      </div>
+
+      <!-- Feedback error -->
+      <p class="form-error" *ngIf="error">
+        {{ error }}
+      </p>
+
+      <!-- Feedback éxito -->
+      <p class="form-success" *ngIf="enviado">
+        Mensaje enviado correctamente ✔️
+      </p>
+
+      <!-- Botón -->
+      <button
+        type="submit"
+        class="btn-enviar"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Enviando...' : 'Enviar mensaje' }}
+      </button>
+
+    </form>
+  </div>
+</div>

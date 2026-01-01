@@ -1,0 +1,410 @@
+/* ============================================================
+   PALETA PREMIUM CAFÉ (coherente con EVENTS)
+============================================================ */
+:host {
+  --cafe-bg-1: #2c1810;
+  --cafe-bg-2: #3d241a;
+  --cafe-text: #f5e6d3;
+  --cafe-accent: #d7b98c;
+  --cafe-accent-dark: #c2a175;
+
+  --shadow-soft: 0 10px 25px rgba(0,0,0,0.25);
+  --shadow-deep: 0 18px 40px rgba(0,0,0,0.45);
+
+  --transition: 0.35s ease;
+  --transition-fast: 0.22s ease;
+
+  display: block;
+  position: relative;
+}
+
+/* ============================================================
+   BACKGROUND — estilo EVENTS
+============================================================ */
+.novedades-background {
+  background: linear-gradient(135deg, var(--cafe-bg-1), var(--cafe-bg-2));
+  padding: 4rem 1.5rem;
+  color: var(--cafe-text);
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+
+  margin-top: -85px;
+  margin-bottom: -35px;
+
+  opacity: 0;
+  transform: translateY(25px);
+  transition: all 0.75s ease;
+
+  &.show {
+    opacity: 1 !important;
+    transform: translateY(0);
+  }
+}
+
+/* CAPA DE CONSTELACIONES */
+.novedades-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(215,185,140,0.18), transparent 70%),
+    radial-gradient(circle at 80% 70%, rgba(215,185,140,0.12), transparent 75%);
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* CONTENEDOR */
+.novedades-container {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   TÍTULO
+============================================================ */
+.title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  text-align: center;
+  letter-spacing: 1px;
+  color: var(--cafe-accent);
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  text-shadow: 0 0 18px rgba(215,185,140,0.4);
+
+  animation: fadeInUp 0.9s ease forwards;
+}
+
+/* ============================================================
+   LISTA DE NOVEDADES
+============================================================ */
+.novedades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+}
+
+/* ============================================================
+   CARD
+============================================================ */
+.novedad-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(215,185,140,0.25);
+  border-radius: 14px;
+  padding: 1.2rem;
+  backdrop-filter: blur(6px);
+  transition: var(--transition);
+  box-shadow: var(--shadow-soft);
+
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+
+  transform: translateY(28px);
+  opacity: 0;
+  animation: fadeInCard 0.9s ease forwards;
+
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--cafe-accent);
+    box-shadow: 0 0 25px rgba(215,185,140,0.25);
+    transform: translateY(-6px);
+  }
+}
+
+/* ============================================================
+   IMG PREVIEW
+============================================================ */
+.novedad-img-wrapper {
+  width: 200px;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+
+  .novedad-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-fast);
+  }
+
+  .novedad-card:hover & .novedad-img {
+    transform: scale(1.06);
+  }
+}
+
+/* ============================================================
+   TEXTO CARD
+============================================================ */
+.novedad-content {
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--cafe-accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .fecha {
+    font-size: 0.95rem;
+    opacity: 0.85;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* ============================================================
+   MODAL — PREMIUM CAFÉ
+============================================================ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  z-index: 5000;
+  animation: fadeInOverlay 0.3s ease;
+}
+
+/* WRAPPER */
+.modal-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 5100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+/* CONTENT */
+.modal-content {
+  position: relative;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(215,185,140,0.25);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  width: 95%;
+  max-width: 650px;
+
+  max-height: 90vh;
+  overflow-y: auto;
+
+  box-shadow: var(--shadow-deep);
+  color: var(--cafe-text);
+
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  animation: modalIn 0.25s ease-out;
+
+  &.closing {
+    animation: modalOut 0.22s ease-out forwards;
+  }
+}
+
+/* BOTÓN CERRAR */
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--cafe-accent);
+  color: var(--cafe-accent);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  transition: var(--transition-fast);
+  font-size: 1.3rem;
+  font-weight: bold;
+
+  &:hover {
+    background: rgba(215,185,140,0.3);
+    color: white;
+    transform: scale(1.08);
+  }
+}
+
+/* IMG */
+.modal-img {
+  width: 100%;
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 18px rgba(0,0,0,0.45);
+}
+
+/* VIDEO */
+.modal-video-wrapper {
+  position: relative;
+  padding-top: 56.25%;
+  margin: 1rem 0;
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    border: none;
+  }
+}
+
+.modal-descripcion {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  opacity: 0.98;
+  margin-top: 1rem;
+  white-space: pre-line;
+}
+
+/* ============================================================
+   ANIMACIONES
+============================================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInCard {
+  from { opacity: 0; transform: translateY(35px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes modalOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.85) translateY(8px); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+    .novedades-background {
+        margin-top: -50px;
+    }
+    .novedad-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .novedad-img-wrapper {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .modal-content {
+    padding: 1.4rem;
+  }
+}
+.modal-content.closing {
+  animation: modalOut 0.22s ease forwards;
+}
+
+@keyframes modalOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+}
+.modal-overlay.closing {
+  animation: fadeOutOverlay 0.25s ease forwards;
+}
+
+@keyframes fadeOutOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+
+/* ============================================================
+   FIX DEFINITIVO MODAL + VIDEO (MOBILE FIRST)
+============================================================ */
+
+/* Modal estructurado */
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+/* Scroll SOLO acá */
+.modal-scroll {
+  overflow-y: auto;
+  padding-right: 0.4rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================
+   VIDEO
+========================= */
+.modal-video-wrapper {
+  position: relative;
+  margin: 1rem 0;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+/* Bloquea scroll/interacción del embed */
+.iframe-blocker {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+/* Iframe base */
+.modal-video-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  z-index: 1;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+
+  .modal-content {
+    width: 100%;
+    max-height: 92vh;
+    padding: 1.2rem;
+  }
+
+  /* 🔥 El video ocupa gran parte de la pantalla */
+  .modal-video-wrapper {
+    height: 60vh;
+  }
+
+  .modal-descripcion {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1.2rem;
+  }
+}

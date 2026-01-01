@@ -1,0 +1,147 @@
+<main class="locals">
+
+  <!-- BG FX (autónomos + glow premium) -->
+  <div class="bg" aria-hidden="true">
+    <div class="orb orb--a"></div>
+    <div class="orb orb--b"></div>
+    <div class="orb orb--c"></div>
+
+    <div class="grid"></div>
+    <div class="grain"></div>
+
+    <div class="spark s1"></div>
+    <div class="spark s2"></div>
+    <div class="spark s3"></div>
+    <div class="spark s4"></div>
+
+    <div class="shine-band"></div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__text">
+      <span class="badge">Locales</span>
+
+      <h1 class="hero__title">Elegí tu recorrido</h1>
+
+      <p class="hero__subtitle">
+        En Mercado Don Francisco vas a encontrar un espacio donde
+        conviven experiencias gastronómicas y tiendas seleccionadas.
+        Entrá a una categoría para ver el adelanto.
+      </p>
+
+      <div class="hero__actions">
+        <button class="cta cta--gold" type="button" (click)="irA('gastronomia')">
+          Gastronomía
+          <span class="cta__arrow">→</span>
+        </button>
+
+        <button class="cta cta--ghost" type="button" (click)="irA('tiendas')">
+          Tiendas
+          <span class="cta__arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PREVIEW PLANO -->
+    <div
+      class="hero__preview"
+      (click)="abrirModal()"
+      [style.transform]="
+        'translate3d(' +
+        ((mouseX + autoX) * 1.1) + 'px,' +
+        ((mouseY + autoY) * 1.1) + 'px, 0)'
+      "
+      role="button"
+      tabindex="0"
+      aria-label="Ver plano del mercado en pantalla completa"
+    >
+      <div class="preview__glow"></div>
+      <div class="preview__frame">
+        <img src="/images/plano.png" class="preview__img" alt="Plano del Mercado Don Francisco" />
+      </div>
+
+      <div class="preview__hint">
+        <span class="dot"></span>
+        Click para ver el plano
+      </div>
+    </div>
+  </section>
+
+  <!-- SELECTOR (épico) -->
+  <section class="chooser" aria-label="Elegir categoría">
+    <button
+      class="card card--gas"
+      type="button"
+      (click)="irA('gastronomia')"
+      [style.transform]="
+        'translate3d(' +
+        ((mouseX + autoX) * 0.35) + 'px,' +
+        ((mouseY + autoY) * 0.35) + 'px, 0)'
+      "
+    >
+      <div class="card__fx" aria-hidden="true"></div>
+      <div class="card__top">
+        <span class="pill">Gastronomía</span>
+        <span class="tag">Experiencia</span>
+      </div>
+
+      <h2 class="card__title">Sabores, café & horno</h2>
+      <p class="card__desc">
+        Adelanto de propuestas gastronómicas, estilo, horarios estimados y la vibra del lugar.
+      </p>
+
+      <div class="card__cta">
+        Explorar Gastronomía <span class="arrow">→</span>
+      </div>
+    </button>
+
+    <button
+      class="card card--shop"
+      type="button"
+      (click)="irA('tiendas')"
+      [style.transform]="
+        'translate3d(' +
+        ((mouseX + autoX) * -0.35) + 'px,' +
+        ((mouseY + autoY) * 0.35) + 'px, 0)'
+      "
+    >
+      <div class="card__fx" aria-hidden="true"></div>
+      <div class="card__top">
+        <span class="pill">Tiendas</span>
+        <span class="tag">Selección</span>
+      </div>
+
+      <h2 class="card__title">Locales, marcas & servicios</h2>
+      <p class="card__desc">
+        Descubrí tiendas y rubros: diseño, regalos, productos regionales y más.
+      </p>
+
+      <div class="card__cta">
+        Explorar Tiendas <span class="arrow">→</span>
+      </div>
+    </button>
+  </section>
+
+</main>
+
+<!-- MODAL FULLSCREEN (PLANO) -->
+<div
+  class="modal-backdrop"
+  *ngIf="modalOpen"
+  (click)="cerrarModal()"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Plano en pantalla completa"
+>
+  <div class="modal" (click)="evitarCerrar($event)">
+    <div class="modal__top">
+      <div class="modal__title">Plano general</div>
+      <button class="modal__x" type="button" (click)="cerrarModal()" aria-label="Cerrar">
+        ✕
+      </button>
+    </div>
+
+    <img src="/images/plano.png" class="modal__image" alt="Plano del Mercado Don Francisco" />
+  </div>
+</div>

@@ -1,0 +1,137 @@
+<div class="perfil-container">
+
+  <!-- ================= HEADER ================= -->
+  <div class="perfil-header">
+    <div>
+      <p class="eyebrow">Administración</p>
+      <h2>Editar noticias</h2>
+      <p class="subtitle">
+        Gestioná las novedades visibles en la web
+      </p>
+      <span class="role admin">ADMIN</span>
+    </div>
+
+    <!-- CREAR -->
+    <button
+      class="login-button admin"
+      (click)="crearNueva()"
+    >
+      + Crear noticia
+    </button>
+  </div>
+
+  <!-- ================= LISTADO ================= -->
+  <div class="info-card" *ngIf="!novedadActiva">
+
+    <div
+      class="info-row clickable"
+      *ngFor="let n of novedades"
+    >
+      <div class="info-main" (click)="seleccionarNovedad(n)">
+        <span class="label">{{ n.titulo }}</span>
+        <strong>{{ n.fecha }}</strong>
+      </div>
+
+      <div class="row-actions">
+        <button
+          class="ghost-button"
+          (click)="seleccionarNovedad(n)"
+        >
+          Editar
+        </button>
+
+        <button
+          class="ghost-button danger"
+          (click)="borrarNovedad(n)"
+        >
+          Borrar
+        </button>
+      </div>
+    </div>
+
+    <p *ngIf="!novedades.length && !loading" class="empty">
+      No hay noticias cargadas
+    </p>
+  </div>
+
+  <!-- ================= FORM (CREAR / EDITAR) ================= -->
+  <div class="password-card" *ngIf="novedadActiva">
+
+    <div class="form-group">
+      <label>Título</label>
+      <input
+        type="text"
+        [(ngModel)]="novedadActiva.titulo"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea
+        rows="4"
+        [(ngModel)]="novedadActiva.descripcion"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Imagen (URL)</label>
+      <input
+        type="text"
+        [(ngModel)]="novedadActiva.imagen"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Video (URL embed)</label>
+      <input
+        type="text"
+        [(ngModel)]="novedadActiva.videoUrl"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Fecha</label>
+      <input
+        type="date"
+        [(ngModel)]="novedadActiva.fecha"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Autor</label>
+      <input
+        type="text"
+        [(ngModel)]="novedadActiva.autor"
+      />
+    </div>
+
+    <!-- ================= ACCIONES ================= -->
+    <div class="actions">
+      <button
+        class="ghost-button"
+        (click)="cancelar()"
+      >
+        Cancelar
+      </button>
+
+      <button
+        class="login-button admin"
+        [disabled]="loading"
+        (click)="modoCreacion ? guardarNueva() : guardarCambios()"
+      >
+        {{ modoCreacion ? 'Crear noticia' : 'Guardar cambios' }}
+      </button>
+    </div>
+
+    <!-- ================= FEEDBACK ================= -->
+    <p class="success" *ngIf="successMessage">
+      {{ successMessage }}
+    </p>
+
+    <p class="error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+  </div>
+
+</div>
