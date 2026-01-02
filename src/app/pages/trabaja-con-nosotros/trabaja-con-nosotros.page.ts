@@ -4,6 +4,8 @@
 // Standalone Page (Angular) + Premium Café UI + GSAP
 //
 // ✅ Incluye:
+// - Proceso Enero → Marzo (recepción / entrevistas / selección)
+// - 3 áreas: Gastronomía, Administración, Atención al público
 // - 3 pasos con CTA (descargar PDF / imprimir / traer a administración)
 // - Modal PRO con Google Maps Embed (sanitizado)
 // - Animaciones GSAP (entrada + modal) con guard SSR + reduced motion
@@ -24,10 +26,26 @@ import {
 import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-
 import { gsap } from 'gsap';
 
 type ModalState = 'closed' | 'opening' | 'open' | 'closing';
+
+type AreaKey = 'gastronomia' | 'administracion' | 'atencion';
+
+type HiringArea = {
+  key: AreaKey;
+  title: string;
+  desc: string;
+  tags: string[];
+  icon: string; // emoji simple (cero libs)
+};
+
+type ProcessPhase = {
+  month: string;
+  title: string;
+  desc: string;
+  chip: string;
+};
 
 @Component({
   selector: 'app-trabaja-con-nosotros',
@@ -52,9 +70,56 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
   // ✅ Embed que pasaste (sanitizado)
   readonly mapsEmbedUrl: SafeResourceUrl;
 
-  // Link externo opcional (por si el usuario prefiere abrir Maps directamente)
+  // Link externo opcional (por si el usuario prefiere abrir Maps directo)
   readonly mapsExternalUrl =
     'https://www.google.com/maps?q=Mercado%20Don%20Francisco%20Shopping%20Center&hl=es&gl=uy';
+
+  // ✅ Proceso (Enero → Marzo)
+  readonly process: ProcessPhase[] = [
+    {
+      month: 'Enero',
+      title: 'Recepción de formularios',
+      desc: 'Recibimos tu formulario completo y revisamos que la información esté correcta.',
+      chip: 'Inicio del proceso',
+    },
+    {
+      month: 'Febrero',
+      title: 'Entrevistas',
+      desc: 'Nos contactamos para coordinar una entrevista según el área a la que postules.',
+      chip: 'Instancia presencial / online',
+    },
+    {
+      month: 'Marzo',
+      title: 'Selección',
+      desc: 'Evaluamos perfiles y comunicamos los resultados a las personas seleccionadas.',
+      chip: 'Cierre del proceso',
+    },
+  ];
+
+  // ✅ Áreas disponibles
+  readonly areas: HiringArea[] = [
+    {
+      key: 'gastronomia',
+      title: 'Gastronomía',
+      desc: 'Cocina, producción, apoyo en eventos y tareas operativas del área gastronómica.',
+      tags: ['Cocina', 'Producción', 'Eventos'],
+      icon: '🍽️',
+    },
+    {
+      key: 'administracion',
+      title: 'Administración',
+      desc: 'Gestión interna, documentación, coordinación y soporte administrativo.',
+      tags: ['Gestión', 'Documentación', 'Organización'],
+      icon: '🗂️',
+    },
+    {
+      key: 'atencion',
+      title: 'Atención al público',
+      desc: 'Recepción, orientación a clientes, apoyo en locales y experiencia del visitante.',
+      tags: ['Recepción', 'Ventas', 'Experiencia'],
+      icon: '🤝',
+    },
+  ];
 
   private tlIntro?: gsap.core.Timeline;
   private modalTl?: gsap.core.Timeline;
@@ -92,7 +157,7 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
     // Intro GSAP
     this.playIntro();
 
-    // Modal inicialmente oculto (pero montado, para poder animar)
+    // Modal inicialmente oculto
     this.hideModalImmediate();
   }
 
@@ -105,14 +170,12 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
   // ============================================================
   // PDF (opcional)
   // ============================================================
-  // Si querés usar un <button (click)="downloadPdf()"> en vez de <a download>
-  // No requiere librerías. Genera una descarga "forzada".
   downloadPdf(): void {
     if (!this.isBrowser) return;
 
     const a = this.document.createElement('a');
-    a.href = this.pdfUrl;        // /pdf/form.pdf
-    a.download = 'form.pdf';     // nombre sugerido
+    a.href = this.pdfUrl; // /pdf/form.pdf
+    a.download = 'form.pdf';
     a.rel = 'noopener';
     this.document.body.appendChild(a);
     a.click();
@@ -135,12 +198,10 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
     const cardEl = this.modalCardRef?.nativeElement;
 
     if (!modalEl || !overlayEl || !cardEl) {
-      // Fallback seguro
       this.modalState = 'open';
       return;
     }
 
-    // Asegurar visible antes de animar
     gsap.set(modalEl, { pointerEvents: 'auto' });
     gsap.set(overlayEl, { autoAlpha: 0 });
     gsap.set(cardEl, { autoAlpha: 0, y: 18, scale: 0.98 });
@@ -150,7 +211,6 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
       defaults: { ease: 'power3.out', duration: this.reducedMotion ? 0 : 0.35 },
       onComplete: () => {
         this.modalState = 'open';
-        // Focus al card para accesibilidad
         cardEl.focus?.();
       },
     });
@@ -192,7 +252,6 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
       .set(modalEl, { pointerEvents: 'none' });
   }
 
-  // Click overlay
   onOverlayClick(): void {
     this.cerrarMapa();
   }
@@ -216,11 +275,11 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
   private setInitialStates(): void {
     const heroEl = this.heroRef?.nativeElement;
     const stepsEl = this.stepsRef?.nativeElement;
-
     if (!heroEl || !stepsEl) return;
 
-    // Intro: dejamos todo listo para entrar suave
     gsap.set(heroEl.querySelectorAll('[data-anim="hero"]'), { autoAlpha: 0, y: 14 });
+    gsap.set(stepsEl.querySelectorAll('[data-anim="phase"]'), { autoAlpha: 0, y: 12 });
+    gsap.set(stepsEl.querySelectorAll('[data-anim="area"]'), { autoAlpha: 0, y: 14 });
     gsap.set(stepsEl.querySelectorAll('.step-card'), { autoAlpha: 0, y: 16 });
     gsap.set(stepsEl.querySelectorAll('.step-card .step-card__shine'), { autoAlpha: 0 });
   }
@@ -231,27 +290,21 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
     if (!heroEl || !stepsEl) return;
 
     if (this.reducedMotion) {
-      // Sin animación: mostrar todo
-      gsap.set(heroEl.querySelectorAll('[data-anim="hero"]'), {
-        clearProps: 'all',
-        autoAlpha: 1,
-        y: 0,
-      });
-      gsap.set(stepsEl.querySelectorAll('.step-card'), {
-        clearProps: 'all',
-        autoAlpha: 1,
-        y: 0,
-      });
+      gsap.set(heroEl.querySelectorAll('[data-anim="hero"]'), { clearProps: 'all', autoAlpha: 1, y: 0 });
+      gsap.set(stepsEl.querySelectorAll('[data-anim="phase"]'), { clearProps: 'all', autoAlpha: 1, y: 0 });
+      gsap.set(stepsEl.querySelectorAll('[data-anim="area"]'), { clearProps: 'all', autoAlpha: 1, y: 0 });
+      gsap.set(stepsEl.querySelectorAll('.step-card'), { clearProps: 'all', autoAlpha: 1, y: 0 });
       this.isLoaded = true;
       return;
     }
 
     const heroBits = heroEl.querySelectorAll('[data-anim="hero"]');
+    const phases = stepsEl.querySelectorAll('[data-anim="phase"]');
+    const areas = stepsEl.querySelectorAll('[data-anim="area"]');
     const cards = stepsEl.querySelectorAll('.step-card');
     const shines = stepsEl.querySelectorAll('.step-card .step-card__shine');
 
     this.tlIntro?.kill();
-
     this.tlIntro = gsap.timeline({
       defaults: { ease: 'power3.out' },
       onComplete: () => {
@@ -261,8 +314,10 @@ export class TrabajaConNosotrosPage implements AfterViewInit, OnDestroy {
 
     this.tlIntro
       .to(heroBits, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.07 }, 0)
-      .to(cards, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 }, 0.25)
-      .to(shines, { autoAlpha: 1, duration: 0.35, stagger: 0.08 }, 0.55);
+      .to(phases, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06 }, 0.18)
+      .to(areas, { autoAlpha: 1, y: 0, duration: 0.55, stagger: 0.06 }, 0.26)
+      .to(cards, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 }, 0.35)
+      .to(shines, { autoAlpha: 1, duration: 0.35, stagger: 0.08 }, 0.62);
   }
 
   private hideModalImmediate(): void {

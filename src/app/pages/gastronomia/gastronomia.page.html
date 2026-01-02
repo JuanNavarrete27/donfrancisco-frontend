@@ -33,37 +33,6 @@
       </div>
     </div>
 
-    <!-- FEATURED (ancho completo pero compacto) -->
-    <button class="featured" type="button" (click)="abrir(featured)">
-      <div class="featured__fx" aria-hidden="true"></div>
-
-  <!-- <div class="featured__row">
-        <div class="featured__left">
-          <div class="featured__top">
-            <span class="pill">Destacado</span>
-            <span class="status" [class.prep]="featured.estado==='En preparación'">{{ featured.estado }}</span>
-          </div>
-
-          <div class="featured__name">{{ featured.nombre }}</div>
-          <div class="featured__meta">{{ featured.tag }}</div>
-          <p class="featured__desc">{{ featured.resumen }}</p>
-
-          <div class="featured__cta">
-            Abrir detalle <span class="arrow">→</span>
-          </div>
-        </div>
--->
-        <div class="featured__right" aria-hidden="true">
-          <div class="featured__badge">
-            <div class="dot"></div>
-            Premium café
-          </div>
-          <div class="featured__chips">
-            <span *ngFor="let h of featured.highlight">• {{ h }}</span>
-          </div>
-        </div>
-      
-    </button>
   </section>
 
   <!-- LISTA FULL WIDTH -->
