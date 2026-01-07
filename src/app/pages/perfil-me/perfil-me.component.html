@@ -56,6 +56,22 @@
         Editar noticias
       </a>
 
+      <a
+        *ngIf="user?.rol === 'admin'"
+        class="login-button admin"
+        routerLink="/admin/contacto"
+      >
+        Formulario contacto
+      </a>
+
+      <a
+        *ngIf="user?.rol === 'admin'"
+        class="login-button admin"
+        routerLink="/admin/salon"
+      >
+        Reserva salón
+      </a>
+
     </section>
   </div>
 </div>
