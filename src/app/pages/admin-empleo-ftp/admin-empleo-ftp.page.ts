@@ -53,8 +53,9 @@ function getApiOrigin(): string {
 const API_ORIGIN = getApiOrigin();
 
 const API_BASE = API_ORIGIN
-  ? `${API_ORIGIN}/api/admin/empleo`
-  : '/api/admin/empleo';
+  ? `${API_ORIGIN}/admin/empleo`
+  : 'https://donfrancisco-backend.fly.dev/admin/empleo';
+
 
 // ==========================================================
 // ✅ AUTH — DON FRANCISCO REAL (df_auth_token)
