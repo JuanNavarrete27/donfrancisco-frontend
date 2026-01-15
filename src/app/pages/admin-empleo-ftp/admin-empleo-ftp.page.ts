@@ -53,8 +53,8 @@ function getApiOrigin(): string {
 const API_ORIGIN = getApiOrigin();
 
 const API_BASE = API_ORIGIN
-  ? `${API_ORIGIN}/admin/empleo`
-  : 'https://donfrancisco-backend.fly.dev/admin/empleo';
+  ? `${API_ORIGIN}/api/admin/empleo`
+  : 'https://donfrancisco-backend.fly.dev/api/admin/empleo';
 
 
 // ==========================================================
