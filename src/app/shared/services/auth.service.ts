@@ -74,29 +74,33 @@ export class AuthService {
       AUTH
   ========================== */
 
-  login(email: string, password: string): Observable<AuthUser> {
-    return this.http
-      .post<AuthResponse>(`${this.apiUrl}/usuarios/login`, { email, password })
-      .pipe(map((response) => this.persistSession(response)));
-  }
+  // In auth.service.ts
+login(usuario: string, password: string): Observable<AuthUser> {
+  return this.http
+    .post<AuthResponse>(`${this.apiUrl}/usuarios/login`, { 
+      email: usuario,  // Send as 'email' for backend compatibility
+      password 
+    })
+    .pipe(map((response) => this.persistSession(response)));
+}
 
-  register(
-    nombre: string,
-    apellido: string,
-    email: string,
-    password: string,
-    telefono: string
-  ): Observable<AuthUser> {
-    return this.http
-      .post<AuthResponse>(`${this.apiUrl}/usuarios/register`, {
-        nombre,
-        apellido,
-        email,
-        password,
-        telefono
-      })
-      .pipe(map((response) => this.persistSession(response)));
-  }
+register(
+  nombre: string,
+  apellido: string,
+  usuario: string,
+  password: string,
+  telefono: string
+): Observable<AuthUser> {
+  return this.http
+    .post<AuthResponse>(`${this.apiUrl}/usuarios/register`, {
+      nombre,
+      apellido,
+      email: usuario,  // Send as 'email' for backend compatibility
+      password,
+      telefono
+    })
+    .pipe(map((response) => this.persistSession(response)));
+}
 
   getProfile(): Observable<AuthUser> {
     if (!this.token) return of(null as unknown as AuthUser);

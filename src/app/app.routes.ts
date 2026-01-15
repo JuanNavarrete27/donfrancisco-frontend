@@ -33,8 +33,8 @@ export const routes: Routes = [
       import('./pages/gastronomia/gastronomia.page').then(m => m.GastronomiaPage),
     title: 'Gastronomía - Don Francisco'
   },
-    {
-      path: 'locales/tiendas',
+  {
+    path: 'locales/tiendas',
     loadComponent: () =>
       import('./pages/tiendas/tiendas.page').then(m => m.TiendasPage),
     title: 'Tiendas - Don Francisco'
@@ -61,9 +61,11 @@ export const routes: Routes = [
   {
     path: 'trabajo',
     loadComponent: () =>
-      import('./pages/trabaja-con-nosotros/trabaja-con-nosotros.page').then(m => m.TrabajaConNosotrosPage),
+      import('./pages/trabaja-con-nosotros/trabaja-con-nosotros.page')
+        .then(m => m.TrabajaConNosotrosPage),
     title: 'Trabajá con nosotros - Don Francisco'
   },
+
   /* ============================================================
      SALÓN DE CONFERENCIAS (NUEVO)
      ============================================================ */
@@ -113,11 +115,25 @@ export const routes: Routes = [
     canActivate: [AdminGuard]
   },
 
-  {   path: 'admin/salon',
+  {
+    path: 'admin/salon',
     loadComponent: () =>
       import('./pages/admin-salon/admin-salon.page')
         .then(m => m.AdminSalonPage),
-    title: 'Administración Salón - Admin'
+    title: 'Administración Salón - Admin',
+    canActivate: [AdminGuard]
+  },
+
+  /* ============================================================
+     ✅ NUEVO: FTP EMPLEO (🔒 SOLO ADMIN)
+     ============================================================ */
+  {
+    path: 'admin/empleo/ftp',
+    loadComponent: () =>
+      import('./pages/admin-empleo-ftp/admin-empleo-ftp.page')
+        .then(m => m.AdminEmpleoFtpPage),
+    title: 'FTP Empleo - Admin',
+    canActivate: [AdminGuard]
   },
 
   /* ============================================================

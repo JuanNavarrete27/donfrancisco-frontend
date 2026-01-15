@@ -42,24 +42,22 @@
             "styles": [
               "src/styles.scss"
             ],
-
             "outputMode": "static"
           },
           "configurations": {
             "production": {
               "budgets": [
-  {
-    "type": "initial",
-    "maximumWarning": "900kb",
-    "maximumError": "1.5mb"
-  },
-  {
-    "type": "anyComponentStyle",
-    "maximumWarning": "16kb",
-    "maximumError": "24kb"
-  }
-]
-,
+                {
+                  "type": "initial",
+                  "maximumWarning": "900kb",
+                  "maximumError": "1.5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kb",
+                  "maximumError": "24kb"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
@@ -70,9 +68,11 @@
           },
           "defaultConfiguration": "production"
         },
-
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "don-francisco:build:production"

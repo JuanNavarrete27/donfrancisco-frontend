@@ -22,7 +22,7 @@ type Country = {
 })
 export class PerfilComponent implements OnInit, OnDestroy {
 
-  email = '';
+  usuario = '';
   password = '';
   confirmPassword = '';
 
@@ -33,6 +33,8 @@ export class PerfilComponent implements OnInit, OnDestroy {
   loading = false;
   isRegisterMode = false;
   errorMessage = '';
+
+  private readonly usernameRegex = /^[a-zA-Z0-9._-]{3,20}$/;
 
   countries: Country[] = [
     { code: 'UY', flag: '🇺🇾', dial: '+598', placeholder: '91234567' },
@@ -88,8 +90,13 @@ export class PerfilComponent implements OnInit, OnDestroy {
 
     this.errorMessage = '';
 
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Completá email y contraseña.';
+    if (!this.usuario || !this.password) {
+      this.errorMessage = 'Completá usuario y contraseña.';
+      return;
+    }
+
+    if (!this.usernameRegex.test(this.usuario)) {
+      this.errorMessage = 'Usuario inválido (3-20 caracteres, letras/números y . _ -)';
       return;
     }
 
@@ -98,6 +105,7 @@ export class PerfilComponent implements OnInit, OnDestroy {
         this.errorMessage = 'Completá todos los campos.';
         return;
       }
+
       if (this.password !== this.confirmPassword) {
         this.errorMessage = 'Las contraseñas no coinciden.';
         return;
@@ -114,11 +122,11 @@ export class PerfilComponent implements OnInit, OnDestroy {
       ? this.authService.register(
           this.nombre,
           this.apellido,
-          this.email,
+          this.usuario,
           this.password,
           telefonoFinal
         )
-      : this.authService.login(this.email, this.password);
+      : this.authService.login(this.usuario, this.password);
 
     request$.subscribe({
       next: () => {
@@ -148,9 +156,6 @@ export class PerfilComponent implements OnInit, OnDestroy {
             this.authService.getProfile().subscribe({
               next: () => {
                 this.hideFeedback();
-                this.loading = false;
-                this.cdr.detectChanges();
-
                 this.router.navigate(['/perfil/me'], { replaceUrl: true });
               },
               error: () => {

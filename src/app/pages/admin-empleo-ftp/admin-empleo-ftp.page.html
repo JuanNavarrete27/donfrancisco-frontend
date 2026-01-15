@@ -1,0 +1,411 @@
+<section class="ftp" [attr.data-mode]="isAdmin() ? 'admin' : 'readonly'">
+
+  <!-- ================= TOP / HERO ================= -->
+  <header class="hero">
+    <div class="hero__left">
+      <div class="badge">
+        <span class="badge__dot"></span>
+        <span class="badge__brand">Don Francisco</span>
+        <span class="badge__sep">•</span>
+        <span class="badge__scope">FTP Empleo</span>
+      </div>
+
+      <h1 class="hero__title">Recepción de Aplicaciones</h1>
+      <p class="hero__subtitle">
+        Panel interno para cargar, revisar y exportar formularios recibidos.
+        <span class="hero__muted">
+          {{ isAdmin() ? 'Modo administrativo.' : 'Modo lectura + exportación.' }}
+        </span>
+      </p>
+
+      <div class="hero__meta">
+        <span class="pill" [class.pill--admin]="isAdmin()" [class.pill--view]="!isAdmin()">
+          {{ isAdmin() ? 'Admin (CRUD)' : ('Solo lectura: ' + roleLabel()) }}
+        </span>
+
+        <span class="pill pill--soft">
+          Total: <b>{{ stats().total }}</b>
+        </span>
+
+        <span class="pill pill--grade">
+          A: <b>{{ stats().A }}</b> •
+          B: <b>{{ stats().B }}</b> •
+          C: <b>{{ stats().C }}</b> •
+          D: <b>{{ stats().D }}</b>
+        </span>
+      </div>
+    </div>
+
+    <div class="hero__right">
+      <div class="actions">
+        <button class="btn btn--ghost" type="button" (click)="exportCsv()" [disabled]="loading()">
+          {{ loading() ? 'Cargando...' : 'Exportar CSV' }}
+        </button>
+
+        <!-- ✅ SOLO ADMIN VE CREAR -->
+        <button
+          *ngIf="isAdmin()"
+          class="btn btn--primary"
+          type="button"
+          (click)="openCreate()"
+          [disabled]="loading()"
+        >
+          + Nueva Aplicación
+        </button>
+      </div>
+
+      <div class="note" *ngIf="!isAdmin()">
+        <div class="note__title">Acceso restringido</div>
+        <div class="note__txt">
+          Tu rol permite <b>visualizar y exportar</b>. Solo <b>Admin</b> puede insertar, editar o eliminar.
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= TOOLBAR ================= -->
+  <div class="toolbar">
+    <div class="search">
+      <span class="search__icon">⌕</span>
+      <input
+        class="search__input"
+        type="text"
+        [value]="query()"
+        (input)="query.set(($any($event.target).value || '').toString())"
+        placeholder="Buscar por nombre, mail, teléfono, área o pre-calificación..."
+      />
+    </div>
+
+    <div class="filters">
+      <label class="select">
+        <span class="select__label">Pre-calificación</span>
+        <select [value]="filterPrequal()" (change)="filterPrequal.set($any($event.target).value)" [disabled]="loading()">
+          <option value="ALL">Todas</option>
+          <option *ngFor="let p of PREQUALS" [value]="p">{{ p }}</option>
+        </select>
+      </label>
+
+      <label class="select">
+        <span class="select__label">Área</span>
+        <select [value]="filterArea()" (change)="filterArea.set($any($event.target).value)" [disabled]="loading()">
+          <option value="ALL">Todas</option>
+          <option *ngFor="let a of WORK_AREAS" [value]="a.id">{{ a.label }}</option>
+        </select>
+      </label>
+
+      <label class="select">
+        <span class="select__label">Por página</span>
+        <select [value]="pageSize()" (change)="pageSize.set(+$any($event.target).value)" [disabled]="loading()">
+          <option [value]="5">5</option>
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+      </label>
+
+      <button class="btn btn--ghost btn--sm" type="button" (click)="clearFilters()" [disabled]="loading()">
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= TABLE ================= -->
+  <section class="panel">
+    <header class="panel__head">
+      <div class="panel__title">
+        <div class="panel__kicker">Aplicaciones</div>
+        <div class="panel__h">
+          Resultados: <b>{{ total() }}</b>
+          <span class="muted" *ngIf="query() || filterPrequal() !== 'ALL' || filterArea() !== 'ALL'">
+            (filtrados)
+          </span>
+        </div>
+      </div>
+
+      <div class="panel__pager">
+        <button
+          class="pagerBtn"
+          type="button"
+          (click)="changePage(page() - 1)"
+          [disabled]="page() <= 1 || loading()"
+        >
+          ←
+        </button>
+        <div class="pagerTxt">
+          Página <b>{{ page() }}</b> / {{ pagesCount() }}
+        </div>
+        <button
+          class="pagerBtn"
+          type="button"
+          (click)="changePage(page() + 1)"
+          [disabled]="page() >= pagesCount() || loading()"
+        >
+          →
+        </button>
+      </div>
+    </header>
+
+    <div class="tableWrap">
+
+      <!-- ✅ LOADING OVERLAY -->
+      <div class="loadingOverlay" *ngIf="loading()">
+        <div class="loadingCard">
+          <div class="loadingSpin"></div>
+          <div class="loadingTitle">Cargando datos...</div>
+          <div class="loadingSub">Conectando con la base de datos</div>
+        </div>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Postulante</th>
+            <th>Contacto</th>
+            <th>Área/s</th>
+            <th class="center">Edad</th>
+            <th class="center">Pre</th>
+
+            <!-- ✅ SOLO ADMIN VE ACCIONES -->
+            <th class="right" *ngIf="isAdmin()">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="paged().length; else emptyState">
+          <tr *ngFor="let r of paged()">
+            <td class="who">
+              <div class="who__name">{{ r.firstName }} {{ r.lastName }}</div>
+
+              <div class="who__meta">
+                <span class="stamp stamp--soft">
+                  ID: MF - {{ ('' + r.id).padStart(3, '0') }}
+                </span>
+
+                <span class="stamp">Alta: {{ r.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span class="stamp stamp--soft">Upd: {{ r.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </td>
+
+            <td class="contact">
+              <div class="contact__item">
+                <span class="dot dot--phone"></span>
+                <span>{{ r.phone }}</span>
+              </div>
+              <div class="contact__item">
+                <span class="dot dot--mail"></span>
+                <span class="mono">{{ r.email }}</span>
+              </div>
+            </td>
+
+            <td class="areas">
+              <span class="chip" *ngFor="let a of r.areas" [attr.data-area]="a">
+                {{ areaBadge(a) }} <span class="chip__txt">{{ areaLabel(a) }}</span>
+              </span>
+            </td>
+
+            <td class="center">
+              <span class="age">{{ r.age }}</span>
+            </td>
+
+            <td class="center">
+              <span class="grade" [attr.data-grade]="r.prequal">{{ r.prequal }}</span>
+            </td>
+
+            <!-- ✅ SOLO ADMIN: BOTONES -->
+            <td class="right" *ngIf="isAdmin()">
+              <div class="rowActions">
+                <button class="miniBtn" type="button" (click)="openEdit(r)" [disabled]="loading()">
+                  Editar
+                </button>
+                <button
+                  class="miniBtn miniBtn--danger"
+                  type="button"
+                  (click)="askDelete(r)"
+                  [disabled]="loading()"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyState>
+        <div class="empty">
+          <div class="empty__icon">☕</div>
+          <div class="empty__title">{{ loading() ? 'Cargando...' : 'Sin resultados' }}</div>
+          <div class="empty__txt">
+            {{ loading()
+              ? 'Obteniendo aplicaciones desde la base de datos...'
+              : 'No hay aplicaciones que coincidan con tu búsqueda o filtros.' }}
+          </div>
+
+          <button class="btn btn--ghost" type="button" (click)="clearFilters()" [disabled]="loading()">
+            Reiniciar filtros
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- ================= TOAST / ERROR ================= -->
+  <div class="toast" *ngIf="toastMsg()">
+    {{ toastMsg() }}
+  </div>
+
+  <div class="error" *ngIf="errorMsg()">
+    {{ errorMsg() }}
+  </div>
+
+  <!-- ================= MODAL CREATE/EDIT (✅ SOLO ADMIN EN DOM) ================= -->
+  <ng-container *ngIf="isAdmin()">
+    <div class="modalBack" *ngIf="modalOpen()" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <header class="modal__head">
+          <div class="modal__title">
+            {{ modalMode() === 'create' ? 'Nueva aplicación' : 'Editar aplicación' }}
+          </div>
+          <button class="xBtn" type="button" (click)="closeModal()">✕</button>
+        </header>
+
+        <div class="modal__body">
+          <form class="form" [formGroup]="form">
+
+            <div class="grid">
+              <label class="field">
+                <span class="field__label">Nombres</span>
+                <input class="field__input" formControlName="firstName" placeholder="Ej: Juan Pablo" />
+                <span class="field__err" *ngIf="form.get('firstName')?.touched && form.get('firstName')?.invalid">
+                  Campo obligatorio (mín 2)
+                </span>
+              </label>
+
+              <label class="field">
+                <span class="field__label">Apellidos</span>
+                <input class="field__input" formControlName="lastName" placeholder="Ej: Navarrete" />
+                <span class="field__err" *ngIf="form.get('lastName')?.touched && form.get('lastName')?.invalid">
+                  Campo obligatorio (mín 2)
+                </span>
+              </label>
+
+              <label class="field">
+                <span class="field__label">Edad</span>
+                <input class="field__input" type="number" formControlName="age" min="14" max="99" />
+                <span class="field__hint">Rango permitido: 14–99</span>
+              </label>
+
+              <label class="field">
+                <span class="field__label">Teléfono</span>
+                <input class="field__input" formControlName="phone" placeholder="+598 99 000 000" />
+              </label>
+
+              <label class="field field--wide">
+                <span class="field__label">Email</span>
+                <input class="field__input" formControlName="email" placeholder="correo@dominio.com" />
+                <span class="field__err" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+                  Email inválido
+                </span>
+              </label>
+            </div>
+
+            <div class="split">
+              <div class="box">
+                <div class="box__head">
+                  <div>
+                    <div class="box__kicker">Área/s de trabajo</div>
+                    <div class="box__title">Selección múltiple</div>
+                  </div>
+
+                  <div class="miniPreview">
+                    <span class="miniPreview__k">Marcadas</span>
+                    <span class="miniPreview__v">{{ selectedAreasPreview() }}</span>
+                  </div>
+                </div>
+
+                <div class="checks" formGroupName="areas">
+                  <label class="check" *ngFor="let a of WORK_AREAS">
+                    <input type="checkbox" [formControlName]="a.id" />
+                    <span class="check__fake"></span>
+                    <span class="check__txt">{{ a.label }}</span>
+                    <span class="check__badge">{{ a.badge }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="box">
+                <div class="box__head">
+                  <div>
+                    <div class="box__kicker">Pre-calificación</div>
+                    <div class="box__title">A / B / C / D</div>
+                  </div>
+
+                  <div class="legend">
+                    <span class="gradeMini" data-grade="A">A</span>
+                    <span class="gradeMini" data-grade="B">B</span>
+                    <span class="gradeMini" data-grade="C">C</span>
+                    <span class="gradeMini" data-grade="D">D</span>
+                  </div>
+                </div>
+
+                <div class="qualGrid">
+                  <label class="qual" *ngFor="let p of PREQUALS">
+                    <input type="radio" formControlName="prequal" [value]="p" />
+                    <span class="qual__card" [attr.data-grade]="p">
+                      <span class="qual__big">{{ p }}</span>
+                      <span class="qual__small">Pre</span>
+                    </span>
+                  </label>
+                </div>
+
+                <div class="hintSoft">
+                  Tip: A es excelente, D es baja prioridad (editable por Admin).
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <footer class="modal__foot">
+          <button class="btn btn--ghost" type="button" (click)="closeModal()" [disabled]="loading()">
+            Cancelar
+          </button>
+
+          <button class="btn btn--primary" type="button" (click)="saveModal()" [disabled]="loading()">
+            {{ modalMode() === 'create' ? (loading() ? 'Guardando...' : 'Guardar') : (loading() ? 'Actualizando...' : 'Actualizar') }}
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- ================= DELETE CONFIRM ================= -->
+    <div class="modalBack" *ngIf="deleteOpen()" (click)="cancelDelete()">
+      <div class="modal modal--small" (click)="$event.stopPropagation()">
+        <header class="modal__head">
+          <div class="modal__title">Confirmar eliminación</div>
+          <button class="xBtn" type="button" (click)="cancelDelete()">✕</button>
+        </header>
+
+        <div class="modal__body">
+          <div class="dangerText">
+            Esta acción elimina el registro definitivamente.
+          </div>
+          <div class="hintSoft">
+            Solo el rol <b>Admin</b> puede borrar registros.
+          </div>
+        </div>
+
+        <footer class="modal__foot">
+          <button class="btn btn--ghost" type="button" (click)="cancelDelete()" [disabled]="loading()">
+            Cancelar
+          </button>
+          <button class="btn btn--danger" type="button" (click)="confirmDelete()" [disabled]="loading()">
+            {{ loading() ? 'Eliminando...' : 'Eliminar' }}
+          </button>
+        </footer>
+      </div>
+    </div>
+  </ng-container>
+
+</section>

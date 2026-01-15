@@ -41,6 +41,7 @@
 
 /* ============================================
    ✅ RUNNER (borde inferior animado) — FIX REAL
+   ✅ FIX PEDIDO: SIN MOVIMIENTO
 ============================================ */
 .header__runner {
   position: absolute;
@@ -71,7 +72,9 @@
 
   will-change: transform;
   transform: translate3d(-220px, 0, 0);
-  animation: runnerMove 3.8s linear infinite;
+
+  /* ❌ ANTES: animation: runnerMove 3.8s linear infinite; */
+  animation: none !important; /* ✅ ya no se mueve */
 }
 
 @keyframes runnerMove {
@@ -732,3 +735,4 @@ a,
   height: 20px;
   flex-shrink: 0;
 }
+

@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://donfrancisco-backend.fly.dev/",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
