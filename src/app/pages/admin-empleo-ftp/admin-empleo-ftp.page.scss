@@ -1140,11 +1140,17 @@
   .table {
     min-width: 860px;
   }
+  .ftp {
+    margin-top: -50px;
+  }
 }
 
 @media (max-width: 980px) {
   .hero {
     grid-template-columns: 1fr;
+  }
+    .ftp {
+    margin-top: -50px;
   }
 
   .toolbar {
@@ -1182,11 +1188,15 @@
   .table {
     min-width: 760px;
   }
+    .ftp {
+    margin-top: -50px;
+  }
 }
 
 @media (max-width: 520px) {
   .ftp {
     padding: 14px 12px 22px;
+  margin-top: -50px;
   }
 
   .hero {
