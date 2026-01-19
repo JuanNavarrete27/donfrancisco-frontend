@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
-import { Subscription, interval, of } from 'rxjs';
-import { catchError, switchMap, filter } from 'rxjs/operators';
+import { Subscription, interval, of, from, EMPTY } from 'rxjs';
+import { catchError, switchMap, filter, concatMap, take, defaultIfEmpty } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../shared/services/auth.service';
@@ -44,8 +44,19 @@ type Toast = {
 })
 export class AdminContactPage implements OnInit, OnDestroy {
 
-  // 🔗 BACKEND REAL
-  private readonly API = 'https://donfrancisco-backend.fly.dev/';
+  // ✅ sin slash final
+  private readonly API = 'https://donfrancisco-backend.fly.dev';
+
+  // ✅ en tu server.js SOLO existen estos
+  private readonly CONTACT_BASES = [
+    `${this.API}/contacto`,
+    `${this.API}/api/contacto`,
+  ];
+
+  private readonly COUNTS_URLS = [
+    `${this.API}/contacto/counts`,
+    `${this.API}/api/contacto/counts`,
+  ];
 
   loading = false;
   loadingCounts = false;
@@ -71,11 +82,12 @@ export class AdminContactPage implements OnInit, OnDestroy {
   badgePulse = false;
   private lastNoLeidos = 0;
 
-  // ==========================================================
-  // MODAL 👇
-  // ==========================================================
   modalOpen = false;
   modalMensaje: ContactMessage | null = null;
+
+  // ✅ permisos
+  canRead = false;
+  canWrite = false;
 
   private subs = new Subscription();
 
@@ -85,15 +97,83 @@ export class AdminContactPage implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
-  /* ==========================================================
-     INIT
-  ========================================================== */
+  // ✅ HEADERS CON TOKEN
+  private authHeaders(): HttpHeaders {
+    const fromService = (this.authService as any)?.token;
+    const fromStorage =
+      localStorage.getItem('df_auth_token') ||
+      localStorage.getItem('token');
+
+    const token = fromService || fromStorage;
+
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+    return headers;
+  }
+
+  // ✅ probar URLS en orden hasta que alguna funcione
+  private tryGet<T>(urls: string[], options?: any) {
+    return from(urls).pipe(
+      concatMap((url) =>
+        this.http.get<T>(url, options).pipe(catchError(() => EMPTY))
+      ),
+      take(1),
+      defaultIfEmpty(null as unknown as T)
+    );
+  }
+
+  // ✅ normalizador (el backend NO siempre devuelve array directo)
+  private normalizeMensajes(res: any): ContactMessage[] {
+    const raw: any[] =
+      Array.isArray(res) ? res :
+      Array.isArray(res?.items) ? res.items :
+      Array.isArray(res?.rows) ? res.rows :
+      Array.isArray(res?.data) ? res.data :
+      Array.isArray(res?.data?.items) ? res.data.items :
+      Array.isArray(res?.data?.rows) ? res.data.rows :
+      [];
+
+    return raw.map((m: any) => ({
+      id: Number(m?.id ?? 0),
+      nombre: String(m?.nombre ?? m?.name ?? ''),
+      email: String(m?.email ?? ''),
+      mensaje: String(m?.mensaje ?? m?.message ?? ''),
+      leido: m?.leido ?? m?.read ?? 0,
+      respondido: m?.respondido ?? m?.answered ?? 0,
+      created_at: String(m?.created_at ?? m?.createdAt ?? m?.fecha ?? ''),
+    })).filter(x => !!x.id);
+  }
+
+  private normalizeCounts(res: any): ContactCounts {
+    const c = res?.counts || res?.data || res || {};
+    return {
+      total: Number(c?.total ?? 0),
+      activos: Number(c?.activos ?? 0),
+      no_leidos: Number(c?.no_leidos ?? c?.unread ?? 0),
+      pendientes_respuesta: Number(c?.pendientes_respuesta ?? c?.pending_reply ?? 0),
+    };
+  }
+
   ngOnInit(): void {
     this.subs.add(
       this.authService.user$
         .pipe(filter(user => !!user))
         .subscribe(() => {
-          if (!this.authService.isAdmin()) {
+
+          this.canWrite = this.authService.isAdmin();
+
+          const rol =
+            (this.authService as any)?.getRol?.() ||
+            (this.authService as any)?.userSubject?.value?.rol ||
+            null;
+
+          const isFuncionario =
+            rol === 'funcionario' ||
+            String(rol || '').toLowerCase() === 'funcionario';
+
+          this.canRead = this.canWrite || isFuncionario;
+
+          if (!this.canRead) {
             this.router.navigateByUrl('/inicio');
             return;
           }
@@ -125,9 +205,6 @@ export class AdminContactPage implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
-  /* ==========================================================
-     FETCH
-  ========================================================== */
   refreshAll(resetOffset = false): void {
     if (resetOffset) this.offset = 0;
     this.fetchCounts().subscribe();
@@ -137,20 +214,26 @@ export class AdminContactPage implements OnInit, OnDestroy {
   fetchCounts() {
     this.loadingCounts = true;
 
-    return this.http.get<ContactCounts>(`${this.API}/contacto/counts`).pipe(
-      catchError(() => {
+    return this.tryGet<any>(this.COUNTS_URLS, {
+      headers: this.authHeaders()
+    }).pipe(
+      catchError((err) => {
+        console.error('[ADMIN CONTACT] counts error', err);
+        this.loadingCounts = false;
         this.toast('error', 'No pude cargar métricas');
         return of({ total: 0, activos: 0, no_leidos: 0, pendientes_respuesta: 0 });
       }),
-      switchMap(res => {
+      switchMap((res: any) => {
         this.loadingCounts = false;
 
-        const now = Number(res?.no_leidos ?? 0);
+        const normalized = this.normalizeCounts(res);
+
+        const now = Number(normalized?.no_leidos ?? 0);
         if (now > this.lastNoLeidos) this.pingBadgePulse();
         this.lastNoLeidos = now;
 
-        this.counts = res;
-        return of(res);
+        this.counts = normalized;
+        return of(normalized);
       })
     );
   }
@@ -165,24 +248,32 @@ export class AdminContactPage implements OnInit, OnDestroy {
       ...(this.unreadOnly ? { unread: 1 } : {})
     };
 
-    return this.http.get<ContactMessage[]>(`${this.API}/contacto`, { params }).pipe(
-      catchError(() => {
+    return this.tryGet<any>(this.CONTACT_BASES, {
+      params,
+      headers: this.authHeaders(),
+    }).pipe(
+      catchError((err) => {
+        console.error('[ADMIN CONTACT] mensajes error', err);
         this.loading = false;
         this.error = 'Error cargando mensajes';
         this.toast('error', 'Error cargando mensajes');
         return of([]);
       }),
-      switchMap(rows => {
+      switchMap((res: any) => {
         this.loading = false;
-        this.mensajes = rows || [];
-        return of(rows);
+
+        console.log('[ADMIN CONTACT] RAW RESPONSE:', res);
+
+        const list = this.normalizeMensajes(res);
+        this.mensajes = list || [];
+
+        console.log('[ADMIN CONTACT] normalizados:', this.mensajes.length);
+
+        return of(this.mensajes);
       })
     );
   }
 
-  /* ==========================================================
-     UI
-  ========================================================== */
   toggleUnreadOnly(): void {
     this.unreadOnly = !this.unreadOnly;
     this.refreshAll(true);
@@ -222,16 +313,12 @@ export class AdminContactPage implements OnInit, OnDestroy {
     return [...busy, ...selected].join(' ');
   }
 
-  // ==========================================================
-  // MODAL ACTIONS 👇
-  // ==========================================================
   openModal(m: ContactMessage): void {
     this.modalMensaje = m;
     this.modalOpen = true;
     this.selectedId = m.id;
 
-    // Opcional: marcar como leído al abrir
-    if (this.isUnread(m)) {
+    if (this.canWrite && this.isUnread(m)) {
       this.marcarLeido(m);
     }
   }
@@ -242,17 +329,19 @@ export class AdminContactPage implements OnInit, OnDestroy {
   }
 
   marcarLeido(m: ContactMessage): void {
+    if (!this.canWrite) return;
     if (!m?.id || !this.isUnread(m)) return;
 
     this.rowBusy[m.id] = true;
 
-    this.http.put(`${this.API}/contacto/${m.id}/leido`, {}).subscribe({
+    this.http.put(`${this.API}/contacto/${m.id}/leido`, {}, { headers: this.authHeaders() }).subscribe({
       next: () => {
         m.leido = 1;
         this.rowBusy[m.id] = false;
         this.fetchCounts().subscribe();
       },
-      error: () => {
+      error: (err) => {
+        console.error('[ADMIN CONTACT] marcarLeido error', err);
         this.rowBusy[m.id] = false;
         this.toast('error', 'No se pudo marcar como leído');
       }
@@ -260,6 +349,10 @@ export class AdminContactPage implements OnInit, OnDestroy {
   }
 
   pedirEliminar(id: number): void {
+    if (!this.canWrite) {
+      this.toast('warn', 'Solo lectura', 'Tu rol (Funcionario) no puede eliminar mensajes.');
+      return;
+    }
     this.confirmDeleteId = id;
   }
 
@@ -269,22 +362,34 @@ export class AdminContactPage implements OnInit, OnDestroy {
   }
 
   confirmarEliminar(): void {
+    if (!this.canWrite) {
+      this.toast('warn', 'Solo lectura', 'No tenés permisos para eliminar.');
+      this.cancelarEliminar();
+      return;
+    }
+
     if (!this.confirmDeleteId) return;
 
     const id = this.confirmDeleteId;
     this.confirmDeleteBusy = true;
 
-    this.http.delete(`${this.API}/contacto/${id}`).subscribe(() => {
-      this.mensajes = this.mensajes.filter(m => m.id !== id);
-      this.confirmDeleteId = null;
-      this.confirmDeleteBusy = false;
-      this.fetchCounts().subscribe();
-    });
+    this.http
+      .delete(`${this.API}/contacto/${id}`, { headers: this.authHeaders() })
+      .subscribe({
+        next: () => {
+          this.mensajes = this.mensajes.filter(m => m.id !== id);
+          this.confirmDeleteId = null;
+          this.confirmDeleteBusy = false;
+          this.fetchCounts().subscribe();
+        },
+        error: (err) => {
+          console.error('[ADMIN CONTACT] delete error', err);
+          this.confirmDeleteBusy = false;
+          this.toast('error', 'No se pudo eliminar el mensaje');
+        }
+      });
   }
 
-  /* ==========================================================
-     TOASTS
-  ========================================================== */
   toast(type: ToastType, title: string, msg?: string, ttlMs = 2600): void {
     const id = `${Date.now()}-${Math.random()}`;
     this.toasts = [{ id, type, title, msg }, ...this.toasts].slice(0, 4);
@@ -295,9 +400,6 @@ export class AdminContactPage implements OnInit, OnDestroy {
     this.toasts = this.toasts.filter(t => t.id !== id);
   }
 
-  /* ==========================================================
-     UTILS
-  ========================================================== */
   private pingBadgePulse(): void {
     this.badgePulse = true;
     setTimeout(() => (this.badgePulse = false), 650);

@@ -13,13 +13,36 @@ import {
 /* ============================================================
    MODELOS
 ============================================================ */
+export interface QuickLink {
+  label: string;
+  path: string;
+}
+
+export interface AuthAccess {
+  role?: string;
+  canReadSalonAdmin?: boolean;
+  canWriteSalonAdmin?: boolean;
+  canReadContactoAdmin?: boolean;
+  canWriteContactoAdmin?: boolean;
+  canReadFtpEmpleo?: boolean;
+  canExportFtpEmpleoCsv?: boolean;
+  canCrudFtpEmpleo?: boolean;
+  quickLinks?: QuickLink[];
+}
+
 export interface AuthUser {
   nombre: string;
   apellido: string;
   email: string;
-  rol: 'admin' | 'user';
+
+  // ✅ FIX: ahora acepta funcionario
+  rol: 'admin' | 'user' | 'funcionario';
+
   telefono?: string;
   foto?: string | null;
+
+  // ✅ nuevo (viene en /usuarios/me)
+  access?: AuthAccess;
 }
 
 interface AuthResponse {
@@ -74,44 +97,43 @@ export class AuthService {
       AUTH
   ========================== */
 
-  // In auth.service.ts
-login(usuario: string, password: string): Observable<AuthUser> {
-  return this.http
-    .post<AuthResponse>(`${this.apiUrl}/usuarios/login`, { 
-      email: usuario,  // Send as 'email' for backend compatibility
-      password 
-    })
-    .pipe(map((response) => this.persistSession(response)));
-}
+  login(usuario: string, password: string): Observable<AuthUser> {
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/usuarios/login`, {
+        email: usuario,
+        password
+      })
+      .pipe(map((response) => this.persistSession(response)));
+  }
 
-register(
-  nombre: string,
-  apellido: string,
-  usuario: string,
-  password: string,
-  telefono: string
-): Observable<AuthUser> {
-  return this.http
-    .post<AuthResponse>(`${this.apiUrl}/usuarios/register`, {
-      nombre,
-      apellido,
-      email: usuario,  // Send as 'email' for backend compatibility
-      password,
-      telefono
-    })
-    .pipe(map((response) => this.persistSession(response)));
-}
+  register(
+    nombre: string,
+    apellido: string,
+    usuario: string,
+    password: string,
+    telefono: string
+  ): Observable<AuthUser> {
+    return this.http
+      .post<AuthResponse>(`${this.apiUrl}/usuarios/register`, {
+        nombre,
+        apellido,
+        email: usuario,
+        password,
+        telefono
+      })
+      .pipe(map((response) => this.persistSession(response)));
+  }
 
   getProfile(): Observable<AuthUser> {
     if (!this.token) return of(null as unknown as AuthUser);
 
     return this.http
-      .get<AuthResponse>(`${this.apiUrl}/usuarios/me`, {
+      .get<any>(`${this.apiUrl}/usuarios/me`, {
         headers: this.getAuthHeaders()
       })
       .pipe(
         map((response) =>
-          this.normalizeUser(response.user || response.data || response)
+          this.normalizeUser(response?.user || response?.data || response)
         ),
         tap((user) => {
           this.userSubject.next(user);
@@ -160,7 +182,12 @@ register(
     return this.userSubject.value?.rol === 'admin';
   }
 
-  getRol(): 'admin' | 'user' | null {
+  isFuncionario(): boolean {
+    return this.userSubject.value?.rol === 'funcionario';
+  }
+
+  // ✅ FIX: incluye funcionario
+  getRol(): 'admin' | 'user' | 'funcionario' | null {
     return this.userSubject.value?.rol ?? null;
   }
 
@@ -214,14 +241,40 @@ register(
     }
   }
 
+  // ✅ Normalización robusta (admin / funcionario / user)
+  private normalizeRol(rawRol: any): 'admin' | 'user' | 'funcionario' {
+    const r = String(rawRol ?? '').toLowerCase().trim();
+
+    if (!r) return 'user';
+
+    if (r === 'admin' || r.includes('admin')) return 'admin';
+
+    // ✅ funcionario aliases
+    if (r === 'funcionario' || r === 'empleado' || r === 'employee' || r === 'worker') {
+      return 'funcionario';
+    }
+
+    // compat
+    if (r === 'usuario' || r === 'user' || r === 'staff') return 'user';
+
+    // fallback safe
+    return 'user';
+  }
+
   private normalizeUser(raw: any): AuthUser {
     return {
       nombre: raw?.nombre ?? '',
       apellido: raw?.apellido ?? '',
       email: raw?.email ?? '',
-      rol: raw?.rol === 'admin' ? 'admin' : 'user',
+
+      // ✅ FIX: ya no pisa funcionario a user
+      rol: this.normalizeRol(raw?.rol ?? raw?.role ?? raw?.perfil),
+
       telefono: raw?.telefono ?? '',
-      foto: raw?.foto ?? null
+      foto: raw?.foto ?? null,
+
+      // ✅ si viene access desde /usuarios/me, lo conservamos
+      access: raw?.access ?? undefined
     };
   }
 

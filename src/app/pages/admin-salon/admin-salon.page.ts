@@ -1,5 +1,4 @@
-// admin-salon.page.ts
-
+// src/app/pages/admin-salon/admin-salon.page.ts
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -53,17 +52,14 @@ type Toast = {
 })
 export class AdminSalonPage implements OnInit, OnDestroy {
 
-  private readonly API = 'https://donfrancisco-backend.fly.dev/';
+  // ✅ Mantenemos tu API para NO romper
+  private readonly API = 'https://donfrancisco-backend.fly.dev';
 
   loading = false;
   error = '';
 
-  // ✅ ahora existe ALL
   estado: SolicitudEstado = 'pending';
-
   solicitudes: SalonSolicitud[] = [];
-
-  // ✅ badge real de pendientes (cuando estamos en all o pending)
   pendingCount = 0;
 
   query = '';
@@ -87,6 +83,10 @@ export class AdminSalonPage implements OnInit, OnDestroy {
 
   private subs = new Subscription();
   private lastPending = 0;
+
+  // ✅ NUEVO: permisos
+  canWrite = false; // solo admin
+  canRead = false;  // admin o funcionario
 
   constructor(
     private http: HttpClient,
@@ -112,8 +112,12 @@ export class AdminSalonPage implements OnInit, OnDestroy {
     this.subs.add(
       this.authService.user$
         .pipe(filter(u => !!u))
-        .subscribe(() => {
-          if (!this.authService.isAdmin()) {
+        .subscribe((u) => {
+          // ✅ FIX: ahora puede entrar admin o funcionario
+          this.canWrite = this.authService.isAdmin();
+          this.canRead = this.authService.isAdmin() || this.authService.isFuncionario();
+
+          if (!this.canRead) {
             this.router.navigateByUrl('/inicio');
             return;
           }
@@ -153,7 +157,6 @@ export class AdminSalonPage implements OnInit, OnDestroy {
       offset: this.offset,
     };
 
-    // ✅ si es ALL, no mandamos estado (tu backend ya trae todo)
     if (this.estado !== 'all') {
       params.estado = this.estado;
     }
@@ -174,7 +177,6 @@ export class AdminSalonPage implements OnInit, OnDestroy {
         const items: SalonSolicitud[] = Array.isArray(res?.items) ? res.items : [];
         this.solicitudes = items;
 
-        // ✅ pending badge count (solo confiable en pending o all)
         if (this.estado === 'pending') {
           this.pendingCount = items.length;
           const now = items.length;
@@ -254,12 +256,21 @@ export class AdminSalonPage implements OnInit, OnDestroy {
     this.modalSolicitud = null;
   }
 
+  // ✅ FIX: funcionario puede ver pero NO aprobar/rechazar
   pedirAprobar(id: number): void {
+    if (!this.canWrite) {
+      this.toast('warn', 'Solo lectura', 'Tu rol (Funcionario) no puede aprobar solicitudes.');
+      return;
+    }
     this.confirmActionId = id;
     this.confirmActionType = 'approve';
   }
 
   pedirRechazar(id: number): void {
+    if (!this.canWrite) {
+      this.toast('warn', 'Solo lectura', 'Tu rol (Funcionario) no puede rechazar solicitudes.');
+      return;
+    }
     this.confirmActionId = id;
     this.confirmActionType = 'reject';
   }
@@ -272,6 +283,13 @@ export class AdminSalonPage implements OnInit, OnDestroy {
 
   confirmarAccion(): void {
     if (!this.confirmActionId || !this.confirmActionType) return;
+
+    // ✅ FIX: doble seguridad
+    if (!this.canWrite) {
+      this.toast('warn', 'Solo lectura', 'No tenés permisos para ejecutar esta acción.');
+      this.cancelarAccion();
+      return;
+    }
 
     const id = this.confirmActionId;
     const type = this.confirmActionType;
@@ -295,7 +313,6 @@ export class AdminSalonPage implements OnInit, OnDestroy {
 
         if (type === 'approve') {
           this.toast('ok', 'Solicitud aprobada', 'Se movió a Aprobadas.');
-          // ✅ te llevo a la tab donde “aparece”
           this.estado = 'approved';
         } else {
           this.toast('ok', 'Solicitud rechazada', 'Se movió a Rechazadas.');

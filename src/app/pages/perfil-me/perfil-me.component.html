@@ -16,7 +16,11 @@
           class="role"
           [class.admin]="user?.rol === 'admin'"
         >
-          {{ user?.rol === 'admin' ? 'Administrador' : 'Usuario' }}
+          {{
+            user?.rol === 'admin'
+              ? 'Administrador'
+              : (user?.rol === 'funcionario' ? 'Funcionario' : 'Usuario')
+          }}
         </p>
 
         <p class="subtitle">{{ user?.email }}</p>
@@ -47,7 +51,9 @@
         Cambiar contraseña
       </button>
 
-      <!-- ADMIN -->
+      <!-- =========================
+           ADMIN (FULL)
+      ========================== -->
       <a
         *ngIf="user?.rol === 'admin'"
         class="login-button admin"
@@ -70,6 +76,41 @@
         routerLink="/admin/salon"
       >
         Reserva salón
+      </a>
+
+      <a
+        *ngIf="user?.rol === 'admin'"
+        class="login-button admin"
+        routerLink="/admin/empleo/ftp"
+      >
+        FTP
+      </a>
+
+      <!-- =========================
+           FUNCIONARIO (READ ONLY)
+      ========================== -->
+      <a
+        *ngIf="user?.rol === 'funcionario'"
+        class="login-button admin"
+        routerLink="/admin/contacto"
+      >
+        Contacto (Lectura)
+      </a>
+
+      <a
+        *ngIf="user?.rol === 'funcionario'"
+        class="login-button admin"
+        routerLink="/admin/salon"
+      >
+        Salón (Lectura)
+      </a>
+
+      <a
+        *ngIf="user?.rol === 'funcionario'"
+        class="login-button admin"
+        routerLink="/admin/empleo/ftp"
+      >
+        FTP (Lectura + Export)
       </a>
 
     </section>

@@ -1,5 +1,60 @@
 import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+
+import { AuthService } from './shared/services/auth.service';
 import { AdminGuard } from './shared/guards/admin.guard';
+
+// ============================================================
+// ✅ GUARDS INLINE (SIN ARCHIVOS NUEVOS)
+// ============================================================
+
+// Solo Admin (para módulos que realmente editan)
+const adminOnlyGuard = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) {
+    router.navigateByUrl('/perfil');
+    return false;
+  }
+
+  if (!auth.isAdmin()) {
+    router.navigateByUrl('/inicio');
+    return false;
+  }
+
+  return true;
+};
+
+// Admin o Funcionario (para módulos READ / STAFF)
+const adminOrFuncionarioGuard = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) {
+    router.navigateByUrl('/perfil');
+    return false;
+  }
+
+  // ✅ admin entra siempre
+  if (auth.isAdmin()) return true;
+
+  // ✅ funcionario también entra (solo lectura en esos módulos)
+  const rol =
+    (auth as any)?.getRol?.() ||
+    (auth as any)?.userSubject?.value?.rol ||
+    null;
+
+  const isFuncionario =
+    rol === 'funcionario' ||
+    String(rol || '').toLowerCase() === 'funcionario';
+
+  if (isFuncionario) return true;
+
+  router.navigateByUrl('/inicio');
+  return false;
+};
 
 export const routes: Routes = [
 
@@ -96,23 +151,15 @@ export const routes: Routes = [
   },
 
   /* ============================================================
-     ADMIN (🔒 SOLO ADMIN)
+     ADMIN + STAFF (✅ ADMIN + FUNCIONARIO)
      ============================================================ */
   {
     path: 'admin/contacto',
     loadComponent: () =>
       import('./pages/admin-contact/admin-contact.page')
         .then(m => m.AdminContactPage),
-    title: 'Buzón de Contacto - Admin',
-    canActivate: [AdminGuard]
-  },
-  {
-    path: 'admin/editar-noticias',
-    loadComponent: () =>
-      import('./pages/editar-noticias/editar-noticias.component')
-        .then(m => m.EditarNoticiasComponent),
-    title: 'Administración Noticias - Admin',
-    canActivate: [AdminGuard]
+    title: 'Buzón de Contacto - Admin/Staff',
+    canActivate: [adminOrFuncionarioGuard]
   },
 
   {
@@ -120,20 +167,29 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/admin-salon/admin-salon.page')
         .then(m => m.AdminSalonPage),
-    title: 'Administración Salón - Admin',
-    canActivate: [AdminGuard]
+    title: 'Administración Salón - Admin/Staff',
+    canActivate: [adminOrFuncionarioGuard]
   },
 
-  /* ============================================================
-     ✅ NUEVO: FTP EMPLEO (🔒 SOLO ADMIN)
-     ============================================================ */
   {
     path: 'admin/empleo/ftp',
     loadComponent: () =>
       import('./pages/admin-empleo-ftp/admin-empleo-ftp.page')
         .then(m => m.AdminEmpleoFtpPage),
-    title: 'FTP Empleo - Admin',
-    canActivate: [AdminGuard]
+    title: 'FTP Empleo - Admin/Staff',
+    canActivate: [adminOrFuncionarioGuard]
+  },
+
+  /* ============================================================
+     ADMIN PURO (✅ SOLO ADMIN)
+     ============================================================ */
+  {
+    path: 'admin/editar-noticias',
+    loadComponent: () =>
+      import('./pages/editar-noticias/editar-noticias.component')
+        .then(m => m.EditarNoticiasComponent),
+    title: 'Administración Noticias - Admin',
+    canActivate: [adminOnlyGuard] // ✅ ahora sí: Admin puro
   },
 
   /* ============================================================

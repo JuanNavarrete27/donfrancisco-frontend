@@ -129,17 +129,7 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
       detalle: '...',
       highlight: ['...'],
       intensidad: 2
-    },
-    {
-      id: 'g8',
-      nombre: 'Veggie (Próximamente)',
-      tag: 'Veggie',
-      estado: 'Próximamente',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['...'],
-      intensidad: 1
-    },
+    }
   ];
 
   get featured(): GastroLocal {
