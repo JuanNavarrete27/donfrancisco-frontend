@@ -3,7 +3,6 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService } from './shared/services/auth.service';
-import { AdminGuard } from './shared/guards/admin.guard';
 
 // ============================================================
 // ✅ GUARDS INLINE (SIN ARCHIVOS NUEVOS)
@@ -51,6 +50,35 @@ const adminOrFuncionarioGuard = () => {
     String(rol || '').toLowerCase() === 'funcionario';
 
   if (isFuncionario) return true;
+
+  router.navigateByUrl('/inicio');
+  return false;
+};
+
+// ✅ NUEVO: Admin o Marketing (para editar noticias)
+const adminOrMarketingGuard = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) {
+    router.navigateByUrl('/perfil');
+    return false;
+  }
+
+  // ✅ admin entra siempre
+  if (auth.isAdmin()) return true;
+
+  const rol =
+    (auth as any)?.getRol?.() ||
+    (auth as any)?.userSubject?.value?.rol ||
+    (auth as any)?.userSubject?.value?.role ||
+    null;
+
+  const isMarketing =
+    rol === 'marketing' ||
+    String(rol || '').toLowerCase() === 'marketing';
+
+  if (isMarketing) return true;
 
   router.navigateByUrl('/inicio');
   return false;
@@ -181,15 +209,15 @@ export const routes: Routes = [
   },
 
   /* ============================================================
-     ADMIN PURO (✅ SOLO ADMIN)
+     ADMIN PURO (✅ ADMIN + MARKETING)
      ============================================================ */
   {
     path: 'admin/editar-noticias',
     loadComponent: () =>
       import('./pages/editar-noticias/editar-noticias.component')
         .then(m => m.EditarNoticiasComponent),
-    title: 'Administración Noticias - Admin',
-    canActivate: [adminOnlyGuard] // ✅ ahora sí: Admin puro
+    title: 'Administración Noticias - Admin/Marketing',
+    canActivate: [adminOrMarketingGuard]
   },
 
   /* ============================================================

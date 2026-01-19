@@ -35,8 +35,8 @@ export interface AuthUser {
   apellido: string;
   email: string;
 
-  // ✅ FIX: ahora acepta funcionario
-  rol: 'admin' | 'user' | 'funcionario';
+  // ✅ FIX REAL: ahora acepta marketing también
+  rol: 'admin' | 'marketing' | 'user' | 'funcionario';
 
   telefono?: string;
   foto?: string | null;
@@ -182,12 +182,23 @@ export class AuthService {
     return this.userSubject.value?.rol === 'admin';
   }
 
+  // ✅ NUEVO
+  isMarketing(): boolean {
+    return this.userSubject.value?.rol === 'marketing';
+  }
+
   isFuncionario(): boolean {
     return this.userSubject.value?.rol === 'funcionario';
   }
 
-  // ✅ FIX: incluye funcionario
-  getRol(): 'admin' | 'user' | 'funcionario' | null {
+  // ✅ NUEVO (te sirve si querés en guards/componentes)
+  isAdminOrMarketing(): boolean {
+    const r = this.userSubject.value?.rol;
+    return r === 'admin' || r === 'marketing';
+  }
+
+  // ✅ FIX: incluye marketing
+  getRol(): 'admin' | 'marketing' | 'user' | 'funcionario' | null {
     return this.userSubject.value?.rol ?? null;
   }
 
@@ -241,15 +252,19 @@ export class AuthService {
     }
   }
 
-  // ✅ Normalización robusta (admin / funcionario / user)
-  private normalizeRol(rawRol: any): 'admin' | 'user' | 'funcionario' {
+  // ✅ Normalización robusta (admin / marketing / funcionario / user)
+  private normalizeRol(rawRol: any): 'admin' | 'marketing' | 'user' | 'funcionario' {
     const r = String(rawRol ?? '').toLowerCase().trim();
 
     if (!r) return 'user';
 
-    if (r === 'admin' || r.includes('admin')) return 'admin';
+    // admin aliases
+    if (r === 'admin' || r === 'administrador' || r.includes('admin')) return 'admin';
 
-    // ✅ funcionario aliases
+    // ✅ marketing aliases
+    if (r === 'marketing' || r === 'mkt' || r === 'market') return 'marketing';
+
+    // funcionario aliases
     if (r === 'funcionario' || r === 'empleado' || r === 'employee' || r === 'worker') {
       return 'funcionario';
     }
@@ -267,13 +282,12 @@ export class AuthService {
       apellido: raw?.apellido ?? '',
       email: raw?.email ?? '',
 
-      // ✅ FIX: ya no pisa funcionario a user
+      // ✅ FIX REAL: ahora respeta marketing
       rol: this.normalizeRol(raw?.rol ?? raw?.role ?? raw?.perfil),
 
       telefono: raw?.telefono ?? '',
       foto: raw?.foto ?? null,
 
-      // ✅ si viene access desde /usuarios/me, lo conservamos
       access: raw?.access ?? undefined
     };
   }

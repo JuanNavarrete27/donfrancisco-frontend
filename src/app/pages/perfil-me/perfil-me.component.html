@@ -14,12 +14,15 @@
 
         <p
           class="role"
-          [class.admin]="user?.rol === 'admin'"
+          [class.admin]="user?.rol === 'admin' || user?.rol === 'marketing'"
         >
           {{
             user?.rol === 'admin'
               ? 'Administrador'
-              : (user?.rol === 'funcionario' ? 'Funcionario' : 'Usuario')
+              : (user?.rol === 'marketing'
+                  ? 'Marketing'
+                  : (user?.rol === 'funcionario' ? 'Funcionario' : 'Usuario')
+                )
           }}
         </p>
 
@@ -55,7 +58,7 @@
            ADMIN (FULL)
       ========================== -->
       <a
-        *ngIf="user?.rol === 'admin'"
+        *ngIf="user?.rol === 'admin' || user?.rol === 'marketing'"
         class="login-button admin"
         routerLink="/admin/editar-noticias"
       >

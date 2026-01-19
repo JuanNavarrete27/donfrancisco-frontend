@@ -12,7 +12,8 @@ export class AuthGuard implements CanActivate {
 
   canActivate(): boolean {
     if (!this.auth.token) {
-      this.router.navigate(['/login']);
+      // ✅ FIX: tu login real es /perfil
+      this.router.navigate(['/perfil']);
       return false;
     }
     return true;

@@ -20,6 +20,9 @@ export class PerfilMeComponent implements OnInit, OnDestroy {
 
   user: AuthUser | null = null;
 
+  // ✅ label de rol (admin / marketing / funcionario / usuario)
+  roleLabel = '';
+
   loadingProfile = false;
   loadingPassword = false;
 
@@ -52,6 +55,11 @@ export class PerfilMeComponent implements OnInit, OnDestroy {
     }
 
     this.startConstellationEffect();
+
+    // ✅ MOSTRAR ROL AL INSTANTE con lo que ya existe (localStorage/AuthService)
+    this.computeRoleLabel();
+
+    // ✅ luego sincronizamos contra backend
     this.loadProfile();
   }
 
@@ -69,10 +77,17 @@ export class PerfilMeComponent implements OnInit, OnDestroy {
     this.authService.getProfile().subscribe({
       next: (user) => {
         this.user = user;
+
+        // ✅ MUY IMPORTANTE:
+        // no confiamos ciegamente en "user.rol" si backend devuelve raro.
+        // Priorizamos rol real del storage/token si existe.
+        this.computeRoleLabel(user);
+
         this.cdr.detectChanges();
       },
       error: (error) => {
         this.errorMessage = this.authService.extractError(error);
+        this.cdr.detectChanges();
       },
       complete: () => {
         this.loadingProfile = false;
@@ -81,8 +96,64 @@ export class PerfilMeComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ==========================================================
+  // ✅ FIX REAL: rol robusto (LOCALSTORAGE + AUTH + JWT + BACKEND)
+  // ==========================================================
+  private computeRoleLabel(profileUser?: any): void {
+    const role =
+      this.safeLower(profileUser?.rol) ||
+      this.safeLower(profileUser?.role) ||
+      this.safeLower(this.authService.getRol?.()) ||
+      this.safeLower(this.getRolFromStoredUser()) ||
+      this.safeLower(this.getRolFromJwtToken()) ||
+      '';
+
+    if (role === 'admin' || role === 'administrador') this.roleLabel = 'Administrador';
+    else if (role === 'marketing' || role === 'mkt') this.roleLabel = 'Marketing';
+    else if (role === 'funcionario' || role === 'empleado') this.roleLabel = 'Funcionario';
+    else this.roleLabel = 'Usuario';
+  }
+
+  private safeLower(v: any): string {
+    return String(v ?? '').toLowerCase().trim();
+  }
+
+  private getRolFromStoredUser(): string {
+    try {
+      const raw = localStorage.getItem('df_auth_user');
+      if (!raw) return '';
+      const obj = JSON.parse(raw);
+      return obj?.rol || obj?.role || obj?.perfil || '';
+    } catch {
+      return '';
+    }
+  }
+
+  // ✅ Lee el rol desde el payload del JWT (FUENTE MÁS CONFIABLE)
+  private getRolFromJwtToken(): string {
+    try {
+      const token = localStorage.getItem('df_auth_token');
+      if (!token) return '';
+      const payload = token.split('.')[1];
+      if (!payload) return '';
+
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+
+      const data = JSON.parse(json);
+      return data?.rol || data?.role || data?.perfil || '';
+    } catch {
+      return '';
+    }
+  }
+
   /* ==========================================================
-     MODAL PASSWORD (FIX REAL)
+     MODAL PASSWORD
   ========================================================== */
   openPasswordModal(): void {
     this.showPasswordModal = true;
@@ -168,7 +239,7 @@ export class PerfilMeComponent implements OnInit, OnDestroy {
   }
 
   /* ==========================================================
-     SCROLL LOCK (CLAVE PARA MODAL)
+     SCROLL LOCK
   ========================================================== */
   private lockScroll(): void {
     document.body.classList.add('no-scroll');

@@ -3,7 +3,7 @@ import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({ providedIn: 'root' })
-export class AdminGuard implements CanActivate {
+export class AdminOrMarketingGuard implements CanActivate {
 
   constructor(
     private auth: AuthService,
@@ -18,15 +18,16 @@ export class AdminGuard implements CanActivate {
       return false;
     }
 
-    // ⛔ Logueado pero NO admin
-    if (!this.auth.isAdmin()) {
-      this.router.navigate(['/error'], {
-        state: { error: '403' }
-      });
-      return false;
-    }
+    // ✅ Admin o Marketing
+    const rol = this.auth.getRol?.() ?? null;
+    const r = String(rol || '').toLowerCase().trim();
 
-    // ✅ Admin OK
-    return true;
+    if (r === 'admin' || r === 'marketing') return true;
+
+    // ⛔ Logueado pero NO tiene rol permitido
+    this.router.navigate(['/error'], {
+      state: { error: '403' }
+    });
+    return false;
   }
 }
