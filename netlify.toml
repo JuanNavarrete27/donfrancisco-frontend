@@ -16,8 +16,9 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Permitir iframe SOLO desde estos orígenes
-    Content-Security-Policy = "frame-ancestors 'self' http://localhost:4200 https://jome.uy https://jomeuy.netlify.app;"
+    # ✅ Quién puede embeber TU sitio (anti-clickjacking)
+    # (esto NO habilita iframes dentro de tu web, solo controla quién te puede embeber a vos)
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self' http://localhost:4200 https://jome.uy https://jomeuy.netlify.app; frame-src 'self' https://bentasca.com https://donfrancisco.uy https://karenbentancor.com https://www.youtube.com https://www.youtube-nocookie.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline'; connect-src 'self' https:;"
 
     # Headers recomendados
     Referrer-Policy = "strict-origin-when-cross-origin"
