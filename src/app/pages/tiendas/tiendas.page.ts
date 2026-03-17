@@ -13,8 +13,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Subject, takeUntil, forkJoin, of, catchError } from 'rxjs';
-import { LocalService, LocalCore, LocalComplete } from '../../shared/services/local.service';
+import { Subject, takeUntil } from 'rxjs';
 
 type TiendaTipo = 'Boutique' | 'Regionales' | 'Regalos' | 'Servicios' | 'Diseño' | 'Tech';
 
@@ -30,6 +29,65 @@ interface Tienda {
   cover_image_url?: string;
 }
 
+// Hardcoded tiendas data
+const HARDCODED_TIENDAS: Tienda[] = [
+  {
+    id: '7',
+    nombre: 'San Carlos Coffee & Cake',
+    tipo: 'Boutique',
+    estado: 'Activo',
+    resumen: 'Café especial y pasteles artesanales en un ambiente acogedor',
+    detalle: 'Disfruta de nuestros cafés de especialidad seleccionados de las mejores plantaciones, acompañados de pasteles hechos en casa.',
+    perks: ['Café especial', 'Pasteles artesanales', 'Ambiente acogedor'],
+    glow: 3,
+    cover_image_url: '/images/banner.png'
+  },
+  {
+    id: '8',
+    nombre: 'Mister Grill Hamburguesas Gourmet',
+    tipo: 'Boutique',
+    estado: 'Activo',
+    resumen: 'Hamburguesas gourmet con ingredientes premium y técnicas únicas',
+    detalle: 'Experimenta hamburguesas únicas preparadas con ingredientes seleccionados y técnicas de cocina que elevan el sabor.',
+    perks: ['Ingredientes premium', 'Técnicas únicas', 'Sabor gourmet'],
+    glow: 2,
+    cover_image_url: '/images/banner.png'
+  },
+  {
+    id: '9',
+    nombre: 'Cremino Gelatto Fatto con Amore',
+    tipo: 'Boutique',
+    estado: 'Activo',
+    resumen: 'Helados artesanales italianos con recetas tradicionales',
+    detalle: 'Auténtico gelatto italiano preparado con amor usando recetas tradicionales y los mejores ingredientes naturales.',
+    perks: ['Helado artesanal', 'Recetas italianas', 'Ingredientes naturales'],
+    glow: 3,
+    cover_image_url: '/images/banner.png'
+  },
+  {
+    id: '10',
+    nombre: 'La Familia Autoservice',
+    tipo: 'Servicios',
+    estado: 'Activo',
+    resumen: 'Servicio completo de productos de primera necesidad',
+    detalle: 'Todo lo que necesitas para tu hogar en un solo lugar, con la calidad y atención que caracteriza a La Familia.',
+    perks: ['Servicio completo', 'Calidad garantizada', 'Atención personal'],
+    glow: 2,
+    cover_image_url: '/images/banner.png'
+  },
+  {
+    id: '11',
+    nombre: 'Etiqueta Negra Carnes Selección Gourmet',
+    tipo: 'Regalos',
+    estado: 'Activo',
+    resumen: 'Carnes premium seleccionadas para los más exigentes',
+    detalle: 'Los mejores cortes de carne seleccionados por expertos, garantizando calidad y sabor inigualables en cada pieza.',
+    perks: ['Carnes premium', 'Selección experta', 'Calidad garantizada'],
+    glow: 3,
+    cover_image_url: '/images/banner.png'
+  }
+];
+
 @Component({
   selector: 'app-locales-tiendas',
   standalone: true,
@@ -38,7 +96,6 @@ interface Tienda {
   styleUrls: ['./tiendas.page.scss'],
 })
 export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
-  private localService = inject(LocalService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
@@ -85,165 +142,13 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    this.localService.getPublicLocalesByCategory('tiendas')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (locales) => {
-          // Load complete data for each locale to get details
-          this.loadCompleteTiendasWithDetails(locales);
-        },
-        error: (err) => {
-          this.error = typeof err === 'string' ? err : 'Error al cargar las tiendas';
-          this.loading = false;
-        }
-      });
-  }
-
-  /**
-   * Load complete tienda data with details for each locale
-   */
-  private loadCompleteTiendasWithDetails(locales: LocalCore[]): void {
-    if (locales.length === 0) {
-      this.puntos = [];
+    // Simulate brief loading for better UX
+    setTimeout(() => {
+      this.puntos = HARDCODED_TIENDAS;
       this.loading = false;
-      return;
-    }
-
-    // FIXED: Filter to only include tiendas slots 7-11
-    const fixedTiendaLocales = locales.filter(local => {
-      const localeId = parseInt(local.id);
-      return localeId >= 7 && localeId <= 11;
-    });
-
-    if (fixedTiendaLocales.length === 0) {
-      this.puntos = [];
-      this.loading = false;
-      return;
-    }
-
-    // Fetch details for each locale
-    const localeObservables = fixedTiendaLocales.map(local => 
-      this.localService.getPublicLocaleById(local.id).pipe(
-        catchError(() => {
-          // If details fail, fallback to basic LocalCore data
-          return of({
-            ...local,
-            details: null,
-            media: null
-          });
-        })
-      )
-    );
-
-    forkJoin(localeObservables)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (completeLocales) => {
-          this.puntos = this.mapAndFilterLocales(completeLocales);
-          this.loading = false;
-          // Re-observe cards after data loads
-          setTimeout(() => this.observeCards(), 0);
-        },
-        error: (err) => {
-          this.error = 'Error al cargar detalles de las tiendas';
-          this.loading = false;
-        }
-      });
-  }
-
-  private mapAndFilterLocales(locales: (LocalComplete | any)[]): Tienda[] {
-    return locales
-      .map((local, index) => this.mapLocalToTienda(local, index));
-  }
-
-  private mapLocalToTienda(local: LocalComplete | any, index: number): Tienda {
-    // Map category to tipo for UI display
-    const tipoMap: Record<string, TiendaTipo> = {
-      'vinoteca': 'Boutique',
-      'pescados': 'Regionales',
-      'autoservice': 'Servicios',
-      'carnes': 'Regalos',
-      'producto': 'Diseño'
-    };
-
-    // Use real backend data instead of hardcoded mapping
-    const displayName = local.display_name || 'Tienda Desconocida';
-    const tipo = tipoMap[local.category] || this.inferTipoFromName(displayName);
-    
-    // Use real backend data
-    const glow: 1 | 2 | 3 = local.featured ? 3 : 2;
-
-    // Extract perks from description or use saved highlights
-    const perks = local.details?.highlights?.length 
-      ? local.details.highlights 
-      : this.extractPerks(local.short_description);
-
-    // Use real backend image URLs
-    const coverImageUrl = local.cover_image_url || local.logo_url || '/assets/default-tienda.png';
-
-    // Use real backend descriptions
-    const displayHeadline = local.details?.headline || local.short_description || 'Descubre esta tienda única en Don Francisco.';
-
-    return {
-      id: local.id,
-      nombre: displayName, // Use real backend display_name
-      tipo: tipo,
-      estado: local.active ? 'Activo' : 'Próximamente',
-      resumen: displayHeadline,
-      detalle: local.long_description || local.short_description || 'Próximamente más información.',
-      perks: perks,
-      glow: glow,
-      cover_image_url: coverImageUrl // Use real backend URLs
-    };
-  }
-
-  private inferTipoFromName(displayName: string): TiendaTipo {
-    const name = displayName.toLowerCase();
-    
-    if (name.includes('vino') || name.includes('vinoteca')) return 'Boutique';
-    if (name.includes('pescado') || name.includes('marisco')) return 'Regionales';
-    if (name.includes('auto') || name.includes('service')) return 'Servicios';
-    if (name.includes('carne') || name.includes('carnicería')) return 'Regalos';
-    if (name.includes('regalo') || name.includes('gift')) return 'Regalos';
-    if (name.includes('diseño') || name.includes('design')) return 'Diseño';
-    if (name.includes('tech') || name.includes('tecnología')) return 'Tech';
-    
-    return 'Boutique'; // default
-  }
-
-  private extractPerks(description: string): string[] {
-    if (!description) return ['Próximamente'];
-    
-    // Extract perks from description
-    const parts = description.split(',').map(p => p.trim()).filter(p => p.length > 0);
-    if (parts.length >= 2 && parts.length <= 4) {
-      return parts.slice(0, 3);
-    }
-    
-    // Default perks based on keywords
-    if (description.toLowerCase().includes('calidad')) return ['Premium', 'Seleccionado', 'Garantizado'];
-    if (description.toLowerCase().includes('artesanal')) return ['Artesanal', 'Tradicional', 'Auténtico'];
-    if (description.toLowerCase().includes('importado')) return ['Importado', 'Exclusivo', 'Original'];
-    
-    return ['Destacado', 'Calidad', 'Variedad'];
-  }
-
-  private generatePerks(local: LocalCore): string[] {
-    const perks: string[] = [];
-    
-    if (local.featured) perks.push('Destacado');
-    if (local.address) perks.push('Con ubicación');
-    if (local.phone || local.whatsapp) perks.push('Contacto directo');
-    
-    // Add category-specific perks
-    const normalizedName = local.display_name.toLowerCase();
-    if (normalizedName.includes('vinoteca')) perks.push('Vinos premium');
-    if (normalizedName.includes('pescado') || normalizedName.includes('fish')) perks.push('Frescura garantizada');
-    if (normalizedName.includes('carne') || normalizedName.includes('etiqueta')) perks.push('Cortes selectos');
-    if (normalizedName.includes('autoservice')) perks.push('Servicio completo');
-    if (normalizedName.includes('producto')) perks.push('Productos regionales');
-
-    return perks.length > 0 ? perks : ['Nuevo local'];
+      // Re-observe cards after data loads
+      setTimeout(() => this.observeCards(), 0);
+    }, 300);
   }
 
   ngAfterViewInit(): void {
@@ -311,19 +216,6 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /**
-   * Get fixed slug mapping for tiendas slots 7-11
-   */
-  private getTiendaSlug(localeId: number): string {
-    const slugMap = {
-      7: 'castagnetvinoteca',
-      8: 'etiquetanegracarniceria',
-      9: 'fishmarketpescaderia',
-      10: 'lafamiliaautoservice',
-      11: 'productodecerrolargo'
-    };
-    return slugMap[localeId as keyof typeof slugMap] || 'unknown';
-  }
 
   // Navigate to detail page instead of opening modal
   abrir(tienda: Tienda) {

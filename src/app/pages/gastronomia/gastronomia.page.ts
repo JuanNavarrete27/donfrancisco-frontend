@@ -12,8 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LocalService, LocalCore, LocalComplete } from '../../shared/services/local.service';
-import { Subject, takeUntil, forkJoin, of, catchError } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 type GastroTag = 'Café' | 'Horno' | 'Parrilla' | 'Pastelería' | 'Veggie' | 'Tragos' | 'Bistró';
 
@@ -29,6 +28,65 @@ type GastroLocal = {
   coverImageUrl?: string;
   headline?: string;
 };
+
+// Hardcoded gastronomia data
+const HARDCODED_GASTRONOMIA: GastroLocal[] = [
+  {
+    id: '2',
+    nombre: 'Entre Brasas Parrilla Oriental',
+    tag: 'Parrilla',
+    estado: 'Activo',
+    resumen: 'Parrilla oriental con cortes premium y ambiente sofisticado',
+    detalle: 'Experimenta los mejores cortes de carne preparados a la parrilla oriental con técnicas tradicionales y un ambiente elegante.',
+    highlight: ['Cortes premium', 'Ambiente sofisticado', 'Técnicas tradicionales'],
+    intensidad: 3,
+    coverImageUrl: '/images/banner.png'
+  },
+  {
+    id: '3',
+    nombre: 'Fornos Pizzeria',
+    tag: 'Horno',
+    estado: 'Activo',
+    resumen: 'Auténtica pizza italiana con masa artesanal y ingredientes premium',
+    detalle: 'Disfruta de pizzas auténticas preparadas en horno de leña con masa fermentada naturalmente y los mejores ingredientes italianos.',
+    highlight: ['Pizza artesanal', 'Horno de leña', 'Ingredientes italianos'],
+    intensidad: 2,
+    coverImageUrl: '/images/banner.png'
+  },
+  {
+    id: '4',
+    nombre: 'Fornos Milanesas & Chiquitos',
+    tag: 'Horno',
+    estado: 'Activo',
+    resumen: 'Milanesas clásicas y chiquitos tradicionales con recetas caseras',
+    detalle: 'Las mejores milanesas de la casa con recetas familiares, acompañadas de nuestros chiquitos tradicionales.',
+    highlight: ['Recetas caseras', 'Tradición familiar', 'Calidad premium'],
+    intensidad: 3,
+    coverImageUrl: '/images/banner.png'
+  },
+  {
+    id: '5',
+    nombre: 'Castagnet Vinoteca',
+    tag: 'Bistró',
+    estado: 'Activo',
+    resumen: 'Selección exclusiva de vinos nacionales e internacionales',
+    detalle: 'Una curada colección de vinos con las mejores etiquetas nacionales e internacionales, ideal para conocedores.',
+    highlight: ['Vinos premium', 'Selección exclusiva', 'Ambiente elegante'],
+    intensidad: 2,
+    coverImageUrl: '/images/banner.png'
+  },
+  {
+    id: '6',
+    nombre: 'Fish Market Pescados & Mariscos',
+    tag: 'Bistró',
+    estado: 'Activo',
+    resumen: 'Pescados y mariscos frescos del día con preparaciones gourmet',
+    detalle: 'Productos del mar seleccionados diariamente, preparados con técnicas gourmet que resaltan su sabor natural.',
+    highlight: ['Producto fresco', 'Preparaciones gourmet', 'Selección diaria'],
+    intensidad: 2,
+    coverImageUrl: '/images/banner.png'
+  }
+];
 
 @Component({
   selector: 'app-locales-gastronomia',
@@ -74,7 +132,6 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   constructor(
-    private localService: LocalService,
     private router: Router
   ) {}
 
@@ -151,143 +208,17 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Carga los locales desde la API y los mapea al formato GastroLocal
+   * Load hardcoded gastronomia data
    */
   loadLocales(): void {
     this.loading = true;
     this.error = null;
 
-    this.localService.getPublicLocalesByCategory('gastronomia')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (locales) => {
-          // Load complete data for each locale to get details
-          this.loadCompleteLocalesWithDetails(locales);
-        },
-        error: (err) => {
-          this.error = typeof err === 'string' ? err : 'Error al cargar los locales';
-          this.loading = false;
-          console.error('Error loading gastronomia locales:', err);
-        }
-      });
-  }
-
-  /**
-   * Load complete locale data with details for each locale
-   */
-  private loadCompleteLocalesWithDetails(locales: LocalCore[]): void {
-    if (locales.length === 0) {
-      this.locales = [];
+    // Simulate brief loading for better UX
+    setTimeout(() => {
+      this.locales = HARDCODED_GASTRONOMIA;
       this.loading = false;
-      return;
-    }
-
-    // FIXED: Filter to only include gastronomia slots 1-6
-    const fixedGastroLocales = locales.filter(local => {
-      const localeId = parseInt(local.id);
-      return localeId >= 1 && localeId <= 6;
-    });
-
-    if (fixedGastroLocales.length === 0) {
-      this.locales = [];
-      this.loading = false;
-      return;
-    }
-
-    // Fetch details for each locale
-    const localeObservables = fixedGastroLocales.map(local => 
-      this.localService.getPublicLocaleById(local.id).pipe(
-        catchError(() => {
-          // If details fail, fallback to basic LocalCore data
-          return of({
-            ...local,
-            details: null,
-            media: null
-          });
-        })
-      )
-    );
-
-    forkJoin(localeObservables)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (completeLocales) => {
-          this.locales = completeLocales.map(local => this.mapToGastroLocal(local));
-          this.loading = false;
-        },
-        error: (err) => {
-          this.error = 'Error al cargar detalles de los locales';
-          this.loading = false;
-          console.error('Error loading locale details:', err);
-        }
-      });
-  }
-
-  /**
-   * Mapea un LocalComplete del API al formato GastroLocal usado por el template
-   */
-  private mapToGastroLocal(local: LocalComplete | any): GastroLocal {
-    // Use real backend data instead of hardcoded mapping
-    const displayName = local.display_name || 'Local Desconocido';
-    
-    // Determine tag based on real business name
-    const tag = this.inferTag(displayName);
-    
-    // Use real backend image URLs
-    const coverImageUrl = local.cover_image_url || local.logo_url || '/assets/default-gastro.png';
-    
-    // Determine intensity based on featured status
-    const intensidad: 1 | 2 | 3 = local.featured ? 3 : 2;
-    
-    // Use real backend descriptions
-    const displayHeadline = local.details?.headline || local.short_description || 'Descubre este lugar único en Don Francisco.';
-    
-    // Use real backend highlights or extract from description
-    const highlights = local.details?.highlights?.length 
-      ? local.details.highlights 
-      : this.extractHighlights(local.short_description);
-
-    return {
-      id: local.id,
-      nombre: displayName, // Use real backend display_name
-      tag: tag,
-      estado: local.active ? 'Activo' : 'Próximamente',
-      resumen: displayHeadline,
-      detalle: local.long_description || local.short_description || 'Próximamente más información.',
-      highlight: highlights,
-      intensidad: intensidad,
-      coverImageUrl: coverImageUrl, // Use real backend URLs
-      headline: local.details?.headline
-    };
-  }
-
-  /**
-   * Infer tag based on display name
-   */
-  private inferTag(displayName: string): GastroTag {
-    const name = displayName.toLowerCase();
-    
-    if (name.includes('coffee') || name.includes('café') || name.includes('cake')) return 'Café';
-    if (name.includes('pizza') || name.includes('fornos') || name.includes('horno')) return 'Horno';
-    if (name.includes('parrilla') || name.includes('grill') || name.includes('brasas')) return 'Parrilla';
-    if (name.includes('sushi') || name.includes('ramen') || name.includes('sakai')) return 'Bistró';
-    if (name.includes('gelato') || name.includes('helado') || name.includes('cremino') || name.includes('pastelería')) return 'Pastelería';
-    if (name.includes('hamburguesa') || name.includes('burger')) return 'Veggie';
-    if (name.includes('milanesa') || name.includes('tragos') || name.includes('bar')) return 'Tragos';
-    
-    return 'Bistró'; // default
-  }
-
-  private extractHighlights(description: string): string[] {
-    if (!description) return ['Próximamente'];
-    
-    // Si la descripción tiene comas, usar las partes como highlights
-    const parts = description.split(',').map(p => p.trim()).filter(p => p.length > 0);
-    if (parts.length >= 2 && parts.length <= 4) {
-      return parts.slice(0, 3);
-    }
-    
-    return ['Especialidad única', 'Ambiente premium'];
+    }, 300);
   }
 
 /**
