@@ -227,74 +227,43 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
    * Mapea un LocalComplete del API al formato GastroLocal usado por el template
    */
   private mapToGastroLocal(local: LocalComplete | any): GastroLocal {
-    // Determinar tag basado en el nombre o datos del local
-    const tag = this.inferTag(local.display_name);
+    // Use real backend data instead of hardcoded mapping
+    const displayName = local.display_name || 'Local Desconocido';
     
-    // Determinar intensidad basada en featured
+    // Determine tag based on real business name
+    const tag = this.inferTag(displayName);
+    
+    // Use real backend image URLs
+    const coverImageUrl = local.cover_image_url || local.logo_url || '/assets/default-gastro.png';
+    
+    // Determine intensity based on featured status
     const intensidad: 1 | 2 | 3 = local.featured ? 3 : 2;
-
-    // Fixed asset image mapping for gastronomia (slots 1-6)
-    const localeId = parseInt(local.id);
-    const fixedAssetImage = this.getGastroAssetImage(localeId);
-
-    // FIXED: Use fixed slot mapping for correct business names
-    const fixedDisplayName = this.getGastroDisplayName(localeId);
-
-    // Priorizar saved headline over short_description
+    
+    // Use real backend descriptions
     const displayHeadline = local.details?.headline || local.short_description || 'Descubre este lugar único en Don Francisco.';
     
-    // Usar saved highlights si existen, sino extraer de descripción
+    // Use real backend highlights or extract from description
     const highlights = local.details?.highlights?.length 
       ? local.details.highlights 
       : this.extractHighlights(local.short_description);
 
     return {
       id: local.id,
-      nombre: fixedDisplayName, // FIXED: Use fixed business name instead of backend display_name
+      nombre: displayName, // Use real backend display_name
       tag: tag,
-      estado: local.active ? 'Activo' : 'Próximamente', // FIXED: Remove "En preparación"
-      resumen: displayHeadline, // Usar headline guardado
+      estado: local.active ? 'Activo' : 'Próximamente',
+      resumen: displayHeadline,
       detalle: local.long_description || local.short_description || 'Próximamente más información.',
-      highlight: highlights, // Usar highlights guardados
+      highlight: highlights,
       intensidad: intensidad,
-      coverImageUrl: fixedAssetImage,
-      headline: local.details?.headline // Guardar headline para posible uso en template
+      coverImageUrl: coverImageUrl, // Use real backend URLs
+      headline: local.details?.headline
     };
   }
 
   /**
-   * Get fixed business display name for gastronomia slots 1-6
+   * Infer tag based on display name
    */
-  private getGastroDisplayName(localeId: number): string {
-    const nameMap = {
-      1: 'Fornos Milanesas',
-      2: 'Entre Brasas Parrilla',
-      3: 'Fornos Pizzeria',
-      4: 'Sakai Sushi',
-      5: 'San Carlos Coffee',
-      6: 'Cremino Gelatto'
-    };
-    return nameMap[localeId as keyof typeof nameMap] || 'Local Desconocido';
-  }
-
-  /**
-   * Get fixed asset image for gastronomia slots 1-6
-   */
-  private getGastroAssetImage(localeId: number): string {
-    if (localeId >= 1 && localeId <= 6) {
-      const assetMap = {
-        1: 'fornosmilanesas',
-        2: 'entrebrasasparrilla', 
-        3: 'fornospizzeria',
-        4: 'sakaisushi',
-        5: 'sancarloscoffee',
-        6: 'creminogelatto'
-      };
-      return `/assets/${assetMap[localeId as keyof typeof assetMap]}.png`;
-    }
-    return '/assets/default-gastro.png';
-  }
-
   private inferTag(displayName: string): GastroTag {
     const name = displayName.toLowerCase();
     
@@ -319,18 +288,6 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
     }
     
     return ['Especialidad única', 'Ambiente premium'];
-  }
-
-  private getGastroSlug(localeId: number): string {
-    const slugMap = {
-      1: 'fornosmilanesas',
-      2: 'entrebrasasparrilla',
-      3: 'fornospizzeria',
-      4: 'sakaisushi',
-      5: 'sancarloscoffee',
-      6: 'creminogelatto'
-    };
-    return slugMap[localeId as keyof typeof slugMap] || 'unknown';
   }
 
 /**

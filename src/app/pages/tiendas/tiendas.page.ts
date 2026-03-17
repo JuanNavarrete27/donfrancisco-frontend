@@ -166,8 +166,9 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
       'producto': 'Diseño'
     };
 
-    // Use backend category or infer from name
-    const tipo = tipoMap[local.category] || this.inferTipoFromName(local.display_name);
+    // Use real backend data instead of hardcoded mapping
+    const displayName = local.display_name || 'Tienda Desconocida';
+    const tipo = tipoMap[local.category] || this.inferTipoFromName(displayName);
     
     // Use real backend data
     const glow: 1 | 2 | 3 = local.featured ? 3 : 2;
@@ -177,59 +178,23 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
       ? local.details.highlights 
       : this.extractPerks(local.short_description);
 
-    // Fixed asset image mapping for tiendas (slots 7-11)
-    const localeId = parseInt(local.id);
-    const fixedAssetImage = this.getTiendaAssetImage(localeId);
+    // Use real backend image URLs
+    const coverImageUrl = local.cover_image_url || local.logo_url || '/assets/default-tienda.png';
 
-    // FIXED: Use fixed slot mapping for correct business names
-    const fixedDisplayName = this.getTiendaDisplayName(localeId);
-
-    // Priorizar saved headline over short_description
+    // Use real backend descriptions
     const displayHeadline = local.details?.headline || local.short_description || 'Descubre esta tienda única en Don Francisco.';
 
     return {
       id: local.id,
-      nombre: fixedDisplayName, // FIXED: Use fixed business name instead of backend display_name
+      nombre: displayName, // Use real backend display_name
       tipo: tipo,
-      estado: local.active ? 'Activo' : 'Próximamente', // FIXED: Remove "En preparación"
-      resumen: displayHeadline, // Usar headline guardado
+      estado: local.active ? 'Activo' : 'Próximamente',
+      resumen: displayHeadline,
       detalle: local.long_description || local.short_description || 'Próximamente más información.',
-      perks: perks, // Usar highlights guardados
+      perks: perks,
       glow: glow,
-      cover_image_url: fixedAssetImage
+      cover_image_url: coverImageUrl // Use real backend URLs
     };
-  }
-
-  /**
-   * Get fixed business display name for tiendas slots 7-11
-   */
-  private getTiendaDisplayName(localeId: number): string {
-    const nameMap = {
-      7: 'Castagnet Vinoteca',
-      8: 'Etiqueta Negra Carnicería',
-      9: 'Fish Market Pescadería',
-      10: 'La Familia Autoserivce',
-      11: 'Producto de Cerro Largo'
-    };
-    return nameMap[localeId as keyof typeof nameMap] || 'Local Desconocido';
-  }
-
-/**
-   * Get fixed asset image for tiendas slots 7-11
-   */
-  private getTiendaAssetImage(localeId: number): string {
-    if (localeId >= 7 && localeId <= 11) {
-      const assetMap = {
-        7: 'castagnetvinoteca',
-        8: 'etiquetanegracarniceria',
-        9: 'fishmarketpescaderia',
-        10: 'lafamiliaautoservice',
-        11: 'productodecerrolargo'
-      };
-      return `/assets/${assetMap[localeId as keyof typeof assetMap]}.png`;
-    }
-    // Fallback to first tienda asset if outside fixed slots
-    return '/assets/castagnetvinoteca.png';
   }
 
   private inferTipoFromName(displayName: string): TiendaTipo {
