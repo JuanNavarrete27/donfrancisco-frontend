@@ -20,123 +20,36 @@
         Descubre nuestras tiendas seleccionadas: vinoteca, pescados, autoservicio, carnes y productos regionales.
         Estética <b>holo/blueprint</b> con spotlight (distinto a Gastronomía).
       </p>
-
-      <div class="search">
-        <span class="search__icon">⌕</span>
-        <input
-          type="text"
-          class="search__input"
-          [value]="query"
-          (input)="setQuery(($any($event.target)).value)"
-          placeholder="Buscar por nombre, tipo o descripción…"
-          aria-label="Buscar tiendas"
-          [disabled]="loading"
-        />
-      </div>
-
-      <div class="filters" role="tablist" aria-label="Filtrar tiendas">
-        <button class="chip" type="button" [class.is-active]="active==='Todos'" (click)="setTipo('Todos')" [disabled]="loading">Todos</button>
-        <button class="chip" type="button" *ngFor="let t of tipos" [class.is-active]="active===t" (click)="setTipo(t)" [disabled]="loading">
-          {{ t }}
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Loading State -->
-  <section class="list" *ngIf="loading" aria-label="Cargando tiendas">
-    <div class="card card--skeleton" *ngFor="let _ of [1,2,3,4,5]">
-      <div class="card__row">
-        <div class="card__left">
-          <div class="skeleton skeleton--pill"></div>
-          <div class="skeleton skeleton--title"></div>
-          <div class="skeleton skeleton--desc"></div>
-        </div>
-        <div class="card__right">
-          <div class="skeleton skeleton--perk"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Error State -->
-  <section class="list" *ngIf="error && !loading" aria-label="Error">
-    <div class="empty empty--error">
-      <p>{{ error }}</p>
-      <button class="chip chip--primary" type="button" (click)="retry()">Reintentar</button>
     </div>
   </section>
 
   <!-- Data State -->
-  <section class="list" *ngIf="!loading && !error" aria-label="Puntos de venta">
+  <section class="list" aria-label="Puntos de venta">
     <button
       #cardEl
       class="card"
       type="button"
-      *ngFor="let p of filtered; let i = index"
+      *ngFor="let p of puntos; let i = index"
       (click)="abrir(p)"
-      [attr.data-glow]="p.glow"
     >
       <div class="card__fx" aria-hidden="true"></div>
       <div class="card__edge" aria-hidden="true"></div>
 
-      <!-- Card image if available -->
-      <div class="card__image" *ngIf="p.cover_image_url">
-        <img [src]="p.cover_image_url" [alt]="p.nombre" loading="lazy" />
+      <!-- Card image -->
+      <div class="card__image">
+        <img [src]="p.image" [alt]="p.display_name" loading="lazy" />
       </div>
 
       <div class="card__row">
         <div class="card__left">
-          <h2 class="card__title">{{ p.nombre }}</h2>
-          <p class="card__desc">{{ p.resumen }}</p>
+          <h2 class="card__title">{{ p.display_name }}</h2>
 
           <div class="card__cta">
             Ver detalle <span class="arrow">→</span>
           </div>
         </div>
-
-        <div class="card__right">
-          <div class="perks">
-            <span class="perk" *ngFor="let k of p.perks">{{ k }}</span>
-          </div>
-
-          <div class="hint" aria-hidden="true">
-            Spotlight activo • Hover = brillo
-          </div>
-        </div>
       </div>
     </button>
-
-    <div class="empty" *ngIf="filtered.length === 0 && !loading">
-      <ng-container *ngIf="puntos.length === 0">
-        No hay tiendas disponibles en este momento.
-      </ng-container>
-      <ng-container *ngIf="puntos.length > 0">
-        No encontramos resultados con ese filtro/búsqueda.
-      </ng-container>
-    </div>
   </section>
 
 </main>
-
-<!-- MODAL (fallback for direct modal access if needed) -->
-<div class="modal-backdrop" *ngIf="modalOpen" (click)="cerrar()" role="dialog" aria-modal="true">
-  <div class="modal" (click)="stop($event)">
-    <div class="modal__top">
-      <div class="modal__title">{{ selected?.nombre }}</div>
-      <button class="modal__x" type="button" (click)="cerrar()" aria-label="Cerrar">✕</button>
-    </div>
-
-    <div class="modal__body">
-      <div class="modal__image" *ngIf="selected?.cover_image_url">
-        <img [src]="selected?.cover_image_url" [alt]="selected?.nombre" />
-      </div>
-
-      <p class="modal__text">{{ selected?.detalle }}</p>
-
-      <div class="perks perks--modal">
-        <span class="perk" *ngFor="let k of selected?.perks">{{ k }}</span>
-      </div>
-    </div>
-  </div>
-</div>

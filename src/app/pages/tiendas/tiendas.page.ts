@@ -15,76 +15,49 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
-type TiendaTipo = 'Boutique' | 'Regionales' | 'Regalos' | 'Servicios' | 'Diseño' | 'Tech';
-
-interface Tienda {
-  id: string;
-  nombre: string;
-  tipo: TiendaTipo;
-  estado: 'Próximamente' | 'Activo';
-  resumen: string;
-  detalle: string;
-  perks: string[];
-  glow: 1 | 2 | 3;
-  cover_image_url?: string;
+interface TiendaLocal {
+  id: number;
+  slug: string;
+  display_name: string;
+  image: string;
 }
 
-// Hardcoded tiendas data
-const HARDCODED_TIENDAS: Tienda[] = [
+const TIENDAS_LOCALES: TiendaLocal[] = [
   {
-    id: '7',
-    nombre: 'San Carlos Coffee & Cake',
-    tipo: 'Boutique',
-    estado: 'Activo',
-    resumen: 'Café especial y pasteles artesanales en un ambiente acogedor',
-    detalle: 'Disfruta de nuestros cafés de especialidad seleccionados de las mejores plantaciones, acompañados de pasteles hechos en casa.',
-    perks: ['Café especial', 'Pasteles artesanales', 'Ambiente acogedor'],
-    glow: 3,
-    cover_image_url: '/images/banner.png'
+    id: 7,
+    slug: 'san-carlos-coffee-cake',
+    display_name: 'San Carlos Coffee & Cake',
+    image: 'assets/sancarloscoffee.png'
   },
   {
-    id: '8',
-    nombre: 'Mister Grill Hamburguesas Gourmet',
-    tipo: 'Boutique',
-    estado: 'Activo',
-    resumen: 'Hamburguesas gourmet con ingredientes premium y técnicas únicas',
-    detalle: 'Experimenta hamburguesas únicas preparadas con ingredientes seleccionados y técnicas de cocina que elevan el sabor.',
-    perks: ['Ingredientes premium', 'Técnicas únicas', 'Sabor gourmet'],
-    glow: 2,
-    cover_image_url: '/images/banner.png'
+    id: 4,
+    slug: 'sakai-sushi',
+    display_name: 'Sakai Sushi',
+    image: 'assets/sakaisushi.png'
   },
   {
-    id: '9',
-    nombre: 'Cremino Gelatto Fatto con Amore',
-    tipo: 'Boutique',
-    estado: 'Activo',
-    resumen: 'Helados artesanales italianos con recetas tradicionales',
-    detalle: 'Auténtico gelatto italiano preparado con amor usando recetas tradicionales y los mejores ingredientes naturales.',
-    perks: ['Helado artesanal', 'Recetas italianas', 'Ingredientes naturales'],
-    glow: 3,
-    cover_image_url: '/images/banner.png'
+    id: 9,
+    slug: 'cremino-gelatto-fatto-con-amore',
+    display_name: 'Cremino Gelatto',
+    image: 'assets/creminogelatto.png'
   },
   {
-    id: '10',
-    nombre: 'La Familia Autoservice',
-    tipo: 'Servicios',
-    estado: 'Activo',
-    resumen: 'Servicio completo de productos de primera necesidad',
-    detalle: 'Todo lo que necesitas para tu hogar en un solo lugar, con la calidad y atención que caracteriza a La Familia.',
-    perks: ['Servicio completo', 'Calidad garantizada', 'Atención personal'],
-    glow: 2,
-    cover_image_url: '/images/banner.png'
+    id: 10,
+    slug: 'la-familia-autoservice',
+    display_name: 'La Familia Autoservice',
+    image: 'assets/lafamiliaautoservice.png'
   },
   {
-    id: '11',
-    nombre: 'Etiqueta Negra Carnes Selección Gourmet',
-    tipo: 'Regalos',
-    estado: 'Activo',
-    resumen: 'Carnes premium seleccionadas para los más exigentes',
-    detalle: 'Los mejores cortes de carne seleccionados por expertos, garantizando calidad y sabor inigualables en cada pieza.',
-    perks: ['Carnes premium', 'Selección experta', 'Calidad garantizada'],
-    glow: 3,
-    cover_image_url: '/images/banner.png'
+    id: 11,
+    slug: 'etiqueta-negra-carnes-seleccion-gourmet',
+    display_name: 'Etiqueta Negra Carnes',
+    image: 'assets/etiquetanegracarniceria.png'
+  },
+  {
+    id: 12,
+    slug: 'producto-de-cerro-largo',
+    display_name: 'Producto de Cerro Largo',
+    image: 'assets/productodecerrolargo.png'
   }
 ];
 
@@ -102,25 +75,12 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
   @HostBinding('class.is-loaded') isLoaded = false;
   @HostBinding('class.reduced') reducedMotion = false;
 
-  // Loading & error states
-  loading = false;
-  error: string | null = null;
-
   // Spotlight holo
   sx = 50; // %
   sy = 35; // %
 
-  // Search + filter
-  query = '';
-  tipos: TiendaTipo[] = ['Boutique', 'Regionales', 'Regalos', 'Servicios', 'Diseño', 'Tech'];
-  active: TiendaTipo | 'Todos' = 'Todos';
-
-  // Modal (keeping for backwards compatibility if needed)
-  modalOpen = false;
-  selected: Tienda | null = null;
-
   // Data from API
-  puntos: Tienda[] = [];
+  puntos: TiendaLocal[] = TIENDAS_LOCALES;
 
   // Scroll reveal
   @ViewChildren('cardEl') cardEls!: QueryList<ElementRef<HTMLElement>>;
@@ -133,23 +93,9 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
         ? (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false)
         : false;
 
-    this.loadTiendas();
-
     setTimeout(() => (this.isLoaded = true), 80);
   }
 
-  private loadTiendas(): void {
-    this.loading = true;
-    this.error = null;
-
-    // Simulate brief loading for better UX
-    setTimeout(() => {
-      this.puntos = HARDCODED_TIENDAS;
-      this.loading = false;
-      // Re-observe cards after data loads
-      setTimeout(() => this.observeCards(), 0);
-    }, 300);
-  }
 
   ngAfterViewInit(): void {
     if (typeof window === 'undefined') return;
@@ -202,43 +148,11 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
     this.sy = Math.max(0, Math.min(100, (e.clientY / h) * 100));
   }
 
-  setTipo(t: TiendaTipo | 'Todos') { this.active = t; }
-  setQuery(v: string) { this.query = v; }
-
-  get filtered(): Tienda[] {
-    const q = this.query.trim().toLowerCase();
-    return this.puntos.filter(p => {
-      const okTipo = this.active === 'Todos' ? true : p.tipo === this.active;
-      const okQ = !q
-        ? true
-        : (p.nombre + ' ' + p.tipo + ' ' + p.resumen).toLowerCase().includes(q);
-      return okTipo && okQ;
-    });
-  }
 
 
   // Navigate to detail page instead of opening modal
-  abrir(tienda: Tienda) {
-    // FIXED: Navigate by locale id instead of slug
-    this.router.navigate(['/locales/id', tienda.id]);
+  abrir(tienda: TiendaLocal) {
+    this.router.navigate(['/local-detail', tienda.slug]);
   }
 
-  // Keep modal methods for backwards compatibility if needed
-  abrirModal(p: Tienda) {
-    this.selected = p;
-    this.modalOpen = true;
-    if (typeof window !== 'undefined') document.body.style.overflow = 'hidden';
-  }
-
-  cerrar() {
-    this.modalOpen = false;
-    this.selected = null;
-    if (typeof window !== 'undefined') document.body.style.overflow = '';
-  }
-
-  retry() {
-    this.loadTiendas();
-  }
-
-  stop(e: MouseEvent) { e.stopPropagation(); }
 }

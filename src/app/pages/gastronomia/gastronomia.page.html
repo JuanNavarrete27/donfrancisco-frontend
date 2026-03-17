@@ -24,76 +24,34 @@
         Ocho propuestas con estética <b>premium café</b>.
         Bajá y descubrí cada local: aparecen con una entrada suave y cinematográfica.
       </p>
-
-      <div class="filters" role="tablist" aria-label="Filtrar gastronomía">
-        <button class="chip" type="button" [class.is-active]="activeTag==='Todos'" (click)="setTag('Todos')">Todos</button>
-        <button class="chip" type="button" *ngFor="let t of tags" [class.is-active]="activeTag===t" (click)="setTag(t)">
-          {{ t }}
-        </button>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- LOADING STATE -->
-  <section class="list list--empty" *ngIf="loading" aria-label="Cargando locales">
-    <div class="loading-indicator">
-      <div class="spinner"></div>
-      <p>Cargando locales gastronómicos...</p>
-    </div>
-  </section>
-
-  <!-- ERROR STATE -->
-  <section class="list list--empty" *ngIf="error && !loading" aria-label="Error al cargar">
-    <div class="error-message">
-      <p>{{ error }}</p>
-      <button class="chip chip--action" (click)="loadLocales()">Reintentar</button>
-    </div>
-  </section>
-
-  <!-- EMPTY STATE -->
-  <section class="list list--empty" *ngIf="!loading && !error && filtered.length === 0" aria-label="Sin resultados">
-    <div class="empty-message">
-      <p>No se encontraron locales para mostrar.</p>
     </div>
   </section>
 
   <!-- LISTA FULL WIDTH -->
-  <section class="list" *ngIf="!loading && !error && filtered.length > 0" aria-label="Locales gastronómicos">
+  <section class="list" *ngIf="locales.length > 0" aria-label="Locales gastronómicos">
     <button
       #cardEl
       class="card"
       type="button"
-      *ngFor="let l of filtered; let i = index"
+      *ngFor="let l of locales; let i = index"
       (click)="abrir(l)"
-      [attr.data-intensity]="l.intensidad"
       [style.--d]="'0.' + (i+1) + 's'"
     >
       <div class="card__fx" aria-hidden="true"></div>
       <div class="card__sweep" aria-hidden="true"></div>
 
-      <!-- Cover Image (if available) -->
-      <div class="card__image" *ngIf="l.coverImageUrl" aria-hidden="true">
-        <img [src]="l.coverImageUrl" [alt]="l.nombre" loading="lazy" />
+      <!-- Cover Image -->
+      <div class="card__image" aria-hidden="true">
+        <img [src]="l.image" [alt]="l.display_name" loading="lazy" />
         <div class="card__image-overlay"></div>
       </div>
 
       <div class="card__row">
         <div class="card__left">
-          <h2 class="card__title">{{ l.nombre }}</h2>
-          <p class="card__desc">{{ l.resumen }}</p>
+          <h2 class="card__title">{{ l.display_name }}</h2>
 
           <div class="card__cta">
             Ver detalle <span class="arrow">→</span>
-          </div>
-        </div>
-
-        <div class="card__right">
-          <div class="kpi">
-            <div class="kpi__label">Highlights</div>
-            <div class="kpi__items">
-              <span class="kpi__item" *ngFor="let h of l.highlight">{{ h }}</span>
-            </div>
           </div>
         </div>
       </div>
