@@ -84,6 +84,22 @@ const adminOrMarketingGuard = () => {
   return false;
 };
 
+// ✅ NUEVO: Local role guard (para gestión de propio local)
+const localGuard = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  if (!auth.isAuthenticated()) {
+    router.navigateByUrl('/perfil');
+    return false;
+  }
+
+  if (auth.isLocal()) return true;
+
+  router.navigateByUrl('/inicio');
+  return false;
+};
+
 export const routes: Routes = [
 
   /* ============================================================
@@ -121,6 +137,18 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/tiendas/tiendas.page').then(m => m.TiendasPage),
     title: 'Tiendas - Don Francisco'
+  },
+  {
+    path: 'locales/:slug',
+    loadComponent: () =>
+      import('./pages/locale-detail/locale-detail.page').then(m => m.LocaleDetailPage),
+    title: 'Local - Don Francisco'
+  },
+  {
+    path: 'locales/id/:id',
+    loadComponent: () =>
+      import('./pages/locale-detail/locale-detail.page').then(m => m.LocaleDetailPage),
+    title: 'Local - Don Francisco'
   },
   {
     path: 'eventos',
@@ -176,6 +204,17 @@ export const routes: Routes = [
       import('./pages/perfil/perfil.component')
         .then(m => m.PerfilComponent),
     title: 'Iniciar Sesión - Don Francisco'
+  },
+
+  /* ============================================================
+     LOCAL ROLE EDITING
+     ============================================================ */
+  {
+    path: 'local-edit',
+    loadComponent: () =>
+      import('./pages/local-edit/local-edit.page').then(m => m.LocalEditPage),
+    title: 'Editar mi Local - Don Francisco',
+    canActivate: [localGuard]
   },
 
   /* ============================================================

@@ -1,0 +1,448 @@
+<div class="local-edit-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button type="button" class="back-btn" (click)="goBack()">
+      <span>←</span> Volver
+    </button>
+    <h1>Editar mi Local</h1>
+    <p>Gestiona la información pública de tu negocio</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Cargando información...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !loading">
+    <div class="error-card">
+      <h3>Error</h3>
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="btn btn--secondary" (click)="loadLocalData()">
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div class="success-message" *ngIf="successMessage">
+    <div class="success-card">
+      <p>{{ successMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- Navigation Tabs -->
+    <div class="section-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeSection === 'resumen'"
+        (click)="setActiveSection('resumen')"
+      >
+        <span class="icon-svg icon-summary"></span> Resumen
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeSection === 'detalles'"
+        (click)="setActiveSection('detalles')"
+      >
+        <span class="icon-svg icon-edit"></span> Detalles
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeSection === 'multimedia'"
+        (click)="setActiveSection('multimedia')"
+      >
+        <span class="icon-svg icon-multimedia"></span> Multimedia
+      </button>
+    </div>
+
+    <!-- RESUMEN SECTION -->
+    <section class="panel-section" *ngIf="activeSection === 'resumen'">
+      <div class="section-header">
+        <h2 class="section-title">Resumen del Local</h2>
+        <p class="section-subtitle">Vista general de tu negocio</p>
+      </div>
+
+      <div class="resumen-grid">
+        <div class="resumen-card">
+          <h3>Información de Contacto</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Dirección</label>
+              <p>{{ local?.address || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Teléfono</label>
+              <p>{{ local?.phone || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Estado</label>
+              <p>{{ local && local.active ? 'Activo' : 'Inactivo' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Título</label>
+              <p>{{ local?.details?.headline || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Subtítulo</label>
+              <p>{{ local?.details?.subheadline || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Descripción</label>
+              <p>{{ local?.details?.description || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Destacados</label>
+              <p>{{ local?.details?.highlights?.join(', ') || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Servicios</label>
+              <p>{{ local?.details?.services?.join(', ') || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Productos</label>
+              <p>{{ local?.details?.featured_products?.join(', ') || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Promoción</label>
+              <p>{{ local?.details?.promotion_text || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Texto del Botón</label>
+              <p>{{ local?.details?.cta_label || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>URL del Botón</label>
+              <p>{{ local?.details?.cta_url || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>URL del Mapa</label>
+              <p>{{ local?.details?.map_url || 'No configurado' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="resumen-card">
+          <h3>Detalles del Local</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Dirección</label>
+              <p>{{ local?.address || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Teléfono</label>
+              <p>{{ local?.phone || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Email</label>
+              <p>{{ local?.email || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Horario</label>
+              <p>{{ local?.opening_hours || 'No configurado' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="resumen-card">
+          <h3>Multimedia</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Logo</label>
+              <img *ngIf="local?.logo_url" [src]="local!.logo_url" [alt]="'Logo de ' + local!.display_name" style="max-width: 60px; max-height: 60px; object-fit: contain; border-radius: 4px;" />
+              <p *ngIf="!local?.logo_url">No configurado</p>
+            </div>
+            <div class="info-item">
+              <label>Imagen de Portada</label>
+              <img *ngIf="local?.cover_image_url" [src]="local!.cover_image_url" [alt]="'Portada de ' + local!.display_name" style="max-width: 60px; max-height: 60px; object-fit: cover; border-radius: 4px;" />
+              <p *ngIf="!local?.cover_image_url">No configurado</p>
+            </div>
+            <div class="info-item">
+              <label>Instagram</label>
+              <p>{{ resolvedInstagramUrl || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Facebook</label>
+              <p>{{ resolvedFacebookUrl || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>TikTok</label>
+              <p>{{ resolvedTiktokUrl || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Sitio Web</label>
+              <p>{{ resolvedWebsiteUrl || 'No configurado' }}</p>
+            </div>
+            <div class="info-item">
+              <label>Estado Multimedia</label>
+              <p>{{ multimediaStatus }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DETALLES SECTION -->
+    <section class="panel-section" *ngIf="activeSection === 'detalles'">
+      <div class="section-header">
+        <h2 class="section-title">Detalles del Local</h2>
+        <p class="section-subtitle">Edita la información principal de tu negocio</p>
+      </div>
+
+      <form (ngSubmit)="saveDetalles()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="headline">Título Principal *</label>
+            <input
+              type="text"
+              id="headline"
+              name="headline"
+              [(ngModel)]="detallesForm.headline"
+              placeholder="Ej: El mejor café de la ciudad"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="subheadline">Subtítulo</label>
+            <input
+              type="text"
+              id="subheadline"
+              name="subheadline"
+              [(ngModel)]="detallesForm.subheadline"
+              placeholder="Ej: Especialidad en granos seleccionados"
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="description">Descripción</label>
+            <textarea
+              id="description"
+              name="description"
+              [(ngModel)]="detallesForm.description"
+              placeholder="Describe tu negocio, historia, especialidades..."
+              rows="4"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="highlights">Destacados (máximo 3)</label>
+            <input
+              type="text"
+              id="highlights"
+              name="highlights"
+              [(ngModel)]="detallesForm.highlights"
+              placeholder="WiFi, Parking, Delivery (separados por comas)"
+              (blur)="validateHighlights()"
+            />
+            <small>Separados por comas. Máximo 3 destacados.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="services">Servicios</label>
+            <input
+              type="text"
+              id="services"
+              name="services"
+              [(ngModel)]="detallesForm.services"
+              placeholder="Desayuno, Almuerzo, Cena (separados por comas)"
+            />
+            <small>Separados por comas</small>
+          </div>
+
+          <div class="form-group">
+            <label for="cta_label">Texto del Botón</label>
+            <input
+              type="text"
+              id="cta_label"
+              name="cta_label"
+              [(ngModel)]="detallesForm.cta_label"
+              placeholder="Ej: Reservar Mesa"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="cta_url">URL del Botón</label>
+            <input
+              type="url"
+              id="cta_url"
+              name="cta_url"
+              [(ngModel)]="detallesForm.cta_url"
+              placeholder="https://ejemplo.com/reserva"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="map_url">URL del Mapa</label>
+            <input
+              type="url"
+              id="map_url"
+              name="map_url"
+              [(ngModel)]="detallesForm.map_url"
+              placeholder="https://maps.google.com/..."
+            />
+          </div>
+
+          <div class="form-group full-width">
+            <label for="promotion_text">Texto Promocional</label>
+            <textarea
+              id="promotion_text"
+              name="promotion_text"
+              [(ngModel)]="detallesForm.promotion_text"
+              placeholder="Ofertas especiales, descuentos, eventos..."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="featured_products">Productos Destacados</label>
+            <input
+              type="text"
+              id="featured_products"
+              name="featured_products"
+              [(ngModel)]="detallesForm.featured_products"
+              placeholder="Café Especial, Té Orgánico (separados por comas)"
+            />
+            <small>Separados por comas</small>
+          </div>
+
+          <div class="form-group">
+            <label for="business_tags">Etiquetas del Negocio</label>
+            <input
+              type="text"
+              id="business_tags"
+              name="business_tags"
+              [(ngModel)]="detallesForm.business_tags"
+              placeholder="Cafetería, WiFi, Pet Friendly (separados por comas)"
+            />
+            <small>Separados por comas</small>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="opening_hours">Horario de Atención</label>
+            <textarea
+              id="opening_hours"
+              name="opening_hours"
+              [(ngModel)]="detallesForm.opening_hours"
+              placeholder="Lunes a Viernes: 9:00-18:00&#10;Sábados: 10:00-14:00&#10;Domingos: Cerrado"
+              rows="3"
+            ></textarea>
+            <small>Especifica los horarios de apertura por día</small>
+          </div>
+
+          <!-- Contact Information -->
+          <h3 class="form-section-title">Información de Contacto</h3>
+          <div class="form-group">
+            <label for="address">Dirección</label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              [(ngModel)]="detallesForm.address"
+              placeholder="Calle 123, Ciudad, País"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Teléfono</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              [(ngModel)]="detallesForm.phone"
+              placeholder="+54 123 4567"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="detallesForm.email"
+              placeholder="contacto@negocio.com"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary" [disabled]="saving">
+            {{ saving ? 'Guardando...' : 'Guardar Detalles' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- MULTIMEDIA SECTION -->
+    <section class="panel-section" *ngIf="activeSection === 'multimedia'">
+      <div class="section-header">
+        <h2 class="section-title">Multimedia</h2>
+        <p class="section-subtitle">Edita las redes sociales de tu local</p>
+      </div>
+
+      <form (ngSubmit)="saveMultimedia()">
+        <div class="form-grid">
+          <!-- Social Media Links -->
+          <h3 class="form-section-title">Redes Sociales</h3>
+          <div class="form-group">
+            <label for="instagram_url">Instagram</label>
+            <input
+              type="url"
+              id="instagram_url"
+              name="instagram_url"
+              [(ngModel)]="mediaForm.instagram_url"
+              placeholder="https://instagram.com/tunegocio"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="facebook_url">Facebook</label>
+            <input
+              type="url"
+              id="facebook_url"
+              name="facebook_url"
+              [(ngModel)]="mediaForm.facebook_url"
+              placeholder="https://facebook.com/tunegocio"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="tiktok_url">TikTok</label>
+            <input
+              type="url"
+              id="tiktok_url"
+              name="tiktok_url"
+              [(ngModel)]="mediaForm.tiktok_url"
+              placeholder="https://tiktok.com/@tunegocio"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="website_url">Sitio Web</label>
+            <input
+              type="url"
+              id="website_url"
+              name="website_url"
+              [(ngModel)]="mediaForm.website_url"
+              placeholder="https://tunegocio.com"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary" [disabled]="saving">
+            {{ saving ? 'Guardando...' : 'Guardar Multimedia' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>

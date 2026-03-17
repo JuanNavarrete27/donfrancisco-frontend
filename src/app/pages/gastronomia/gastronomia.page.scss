@@ -141,31 +141,6 @@
   background: rgba(18,10,6,0.55);
 }
 
-/* Pills/status */
-.pill{
-  display:inline-flex;
-  padding: .45rem .8rem;
-  border-radius: 999px;
-  border: 1px solid rgba(215,185,140,0.25);
-  background: rgba(0,0,0,0.22);
-  color: rgba(245,238,226,0.90);
-  text-transform: uppercase;
-  letter-spacing:.08em;
-  font-weight: 950;
-  font-size: .78rem;
-}
-.status{
-  padding: .38rem .7rem;
-  border-radius: 999px;
-  border: 1px solid rgba(215,185,140,0.18);
-  color: rgba(215,185,140,0.92);
-  background: rgba(0,0,0,0.18);
-  font-weight: 900;
-  font-size: .84rem;
-  white-space: nowrap;
-}
-.status.prep{ border-color: rgba(245,238,226,0.16); color: rgba(245,238,226,0.85); }
-
 /* Featured */
 .featured{
   /* RESET button */
@@ -366,6 +341,58 @@
   gap: 1rem;
   align-items: start;
 }
+
+/* Premium card image zone with glassmorphism */
+.card__image{
+  position: relative;
+  width: 100%;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, 
+    rgba(215,185,140,0.12) 0%, 
+    rgba(202,164,111,0.08) 50%, 
+    rgba(180,145,95,0.05) 100%);
+  border: 1px solid rgba(215,185,140,0.15);
+  box-shadow: 
+    0 8px 32px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card__image img{
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  filter: 
+    drop-shadow(0 4px 12px rgba(0,0,0,0.3))
+    brightness(0) invert(1) /* FIXED: Convert black PNG to white */
+    sepia(1) saturate(2) hue-rotate(315deg); /* Add warm gold tone */
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.card__image-overlay{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    rgba(215,185,140,0.05) 0%,
+    transparent 50%,
+    rgba(202,164,111,0.03) 100%);
+  pointer-events: none;
+}
+
+.card:hover .card__image img{
+  transform: scale(1.05);
+  filter: 
+    drop-shadow(0 6px 16px rgba(215,185,140,0.2))
+    brightness(0) invert(1)
+    sepia(1) saturate(2.5) hue-rotate(315deg); /* Enhanced gold on hover */
+}
+
 .card__top{ display:flex; justify-content:space-between; align-items:center; gap:.75rem; }
 .card__title{
   margin:.85rem 0 .4rem;
@@ -384,6 +411,12 @@
   color: rgba(215,185,140,0.95);
   font-weight: 980;
   display:inline-flex; gap:.55rem; align-items:center;
+  transition: all 0.3s ease;
+}
+
+.card:hover .card__cta{
+  color: rgba(245,238,226,1);
+  text-shadow: 0 0 20px rgba(215,185,140,0.3);
 }
 
 .kpi{

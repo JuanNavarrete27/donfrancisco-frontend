@@ -1,0 +1,296 @@
+<main class="locale-detail">
+
+  <!-- Background FX -->
+  <div class="bg" aria-hidden="true">
+    <div class="orb a"></div>
+    <div class="orb b"></div>
+    <div class="grid"></div>
+    <div class="grain"></div>
+    <div class="shine"></div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="state-container" *ngIf="loading">
+    <div class="loader">
+      <div class="loader__spinner"></div>
+      <p class="loader__text">Cargando...</p>
+    </div>
+  </div>
+
+  <!-- Error State (404) -->
+  <div class="state-container" *ngIf="notFound && !loading">
+    <div class="error-card">
+      <div class="error-card__icon">🏪</div>
+      <h2 class="error-card__title">Local no encontrado</h2>
+      <p class="error-card__message">
+        El local que buscás no existe o no está disponible en este momento.
+      </p>
+      <div class="error-card__actions">
+        <button class="btn btn--gold" (click)="goToLocales()">
+          Ver todos los locales
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State (Generic) -->
+  <div class="state-container" *ngIf="error && !loading && !notFound">
+    <div class="error-card">
+      <div class="error-card__icon">⚠️</div>
+      <h2 class="error-card__title">Algo salió mal</h2>
+      <p class="error-card__message">{{ error }}</p>
+      <div class="error-card__actions">
+        <button class="btn btn--outline" (click)="loadLocale(slug)">Reintentar</button>
+        <button class="btn btn--gold" (click)="goToLocales()">Ver locales</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="locale && !loading && !notFound">
+
+    <!-- Navigation Header -->
+    <header class="top-bar">
+      <button class="back-btn" (click)="goBack()">
+        <span class="back-btn__arrow">←</span>
+        <span class="back-btn__text">Volver a {{ categoryLabel }}</span>
+      </button>
+      <span class="category-badge">{{ categoryLabel }}</span>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" data-section="hero" appParticleEffect [particleCount]="20">
+      <div class="hero__image-container">
+        <img
+          *ngIf="locale.cover_image_url"
+          [src]="locale.cover_image_url"
+          [alt]="locale.display_name"
+          class="hero__image"
+          loading="eager"
+        />
+        <div *ngIf="!locale.cover_image_url" class="hero__image hero__image--fallback">
+          <div class="hero__fallback-content">
+            <span class="hero__fallback-icon">🏪</span>
+          </div>
+        </div>
+        <div class="hero__overlay"></div>
+
+        <!-- Logo overlay if available -->
+        <div class="hero__logo" *ngIf="locale.logo_url" appGsapEntrance entranceFrom="scale" [entranceDelay]="0.3">
+          <img [src]="locale.logo_url" [alt]="'Logo de ' + locale.display_name" />
+        </div>
+      </div>
+
+      <div class="hero__content">
+        <h1 class="hero__title" appGsapEntrance entranceFrom="bottom" [entranceDelay]="0.2">{{ locale.display_name }}</h1>
+        <p class="hero__subtitle" *ngIf="locale.hero_subtitle || locale.short_description" appGsapEntrance entranceFrom="bottom" [entranceDelay]="0.4">
+          {{ locale.hero_subtitle || locale.short_description }}
+        </p>
+        <div class="hero__tags" *ngIf="locale.details?.business_tags?.length" appGsapEntrance entranceFrom="bottom" [entranceDelay]="0.6">
+          <span class="hero__tag" *ngFor="let tag of locale.details?.business_tags; let i = index" appGsapEntrance entranceFrom="scale" [entranceDelay]="0.8 + i * 0.1">{{ tag }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+
+      <!-- Details Section -->
+      <section class="section section--details" data-section="details" *ngIf="hasDetails">
+        <div class="section__inner">
+
+          <!-- Headline / Subheadline -->
+          <div class="details-header" *ngIf="locale.details?.headline || locale.details?.subheadline">
+            <h2 class="details-header__title" *ngIf="locale.details?.headline">
+              {{ locale.details?.headline }}
+            </h2>
+            <p class="details-header__subtitle" *ngIf="locale.details?.subheadline">
+              {{ locale.details?.subheadline }}
+            </p>
+          </div>
+
+          <!-- Promotion Banner -->
+          <div class="promo-banner" *ngIf="locale.details?.promotion_text">
+            <span class="promo-banner__badge">Promoción</span>
+            <p class="promo-banner__text">{{ locale.details?.promotion_text }}</p>
+          </div>
+
+          <!-- Description -->
+          <div class="description" *ngIf="locale.details?.description || locale.long_description">
+            <p class="description__text">
+              {{ locale.details?.description || locale.long_description }}
+            </p>
+          </div>
+
+          <!-- Highlights -->
+          <div class="highlights" *ngIf="locale.details?.highlights?.length">
+            <h3 class="highlights__title">Destacados</h3>
+            <ul class="highlights__list">
+              <li class="highlights__item" *ngFor="let highlight of locale.details?.highlights">
+                <span class="highlights__bullet">✦</span>
+                <span>{{ highlight }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Services -->
+          <div class="services" *ngIf="locale.details?.services?.length">
+            <h3 class="services__title">Servicios</h3>
+            <div class="services__grid">
+              <div class="service-chip" *ngFor="let service of locale.details?.services">
+                {{ service }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Featured Products -->
+          <div class="products" *ngIf="locale.details?.featured_products?.length">
+            <h3 class="products__title">Productos Destacados</h3>
+            <div class="products__list">
+              <div class="product-card" *ngFor="let product of locale.details?.featured_products">
+                {{ product }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom CTA -->
+          <div class="custom-cta" *ngIf="locale.details?.cta_label && locale.details?.cta_url">
+            <a [href]="locale.details?.cta_url" target="_blank" rel="noopener" class="btn btn--large btn--gold">
+              {{ locale.details?.cta_label }}
+            </a>
+          </div>
+        </div>
+      </section>
+
+
+      
+      <!-- Contact Section -->
+      <section class="section section--contact" data-section="contact" *ngIf="hasContactInfo">
+        <div class="section__inner">
+          <h2 class="section__title">Contacto</h2>
+
+          <div class="contact-grid">
+            <!-- Address -->
+            <div class="contact-item" *ngIf="locale.address">
+              <div class="contact-item__icon icon-svg icon-address"></div>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Dirección</span>
+                <span class="contact-item__value">{{ locale.address }}</span>
+              </div>
+            </div>
+
+            <!-- Opening Hours -->
+            <div class="contact-item" *ngIf="locale.opening_hours">
+              <div class="contact-item__icon icon-svg icon-hours"></div>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Horario</span>
+                <span class="contact-item__value">{{ locale.opening_hours }}</span>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="contact-item contact-item--clickable" *ngIf="locale.phone" (click)="callPhone(locale.phone)">
+              <div class="contact-item__icon icon-svg icon-phone"></div>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Teléfono</span>
+                <span class="contact-item__value">{{ locale.phone }}</span>
+              </div>
+              <span class="contact-item__action">Llamar →</span>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="contact-item contact-item--clickable" *ngIf="locale.whatsapp" (click)="openWhatsApp(locale.whatsapp)">
+              <div class="contact-item__icon icon-svg icon-whatsapp contact-item__icon--whatsapp"></div>
+              <div class="contact-item__content">
+                <span class="contact-item__label">WhatsApp</span>
+                <span class="contact-item__value">{{ locale.whatsapp }}</span>
+              </div>
+              <span class="contact-item__action">Chat →</span>
+            </div>
+
+            <!-- Email -->
+            <div class="contact-item contact-item--clickable" *ngIf="locale.email" (click)="sendEmail(locale.email)">
+              <div class="contact-item__icon icon-svg icon-email"></div>
+              <div class="contact-item__content">
+                <span class="contact-item__label">Email</span>
+                <span class="contact-item__value">{{ locale.email }}</span>
+              </div>
+              <span class="contact-item__action">Enviar →</span>
+            </div>
+          </div>
+
+          <!-- Map CTA -->
+          <div class="map-cta" *ngIf="locale.details?.map_url">
+            <button class="btn btn--outline btn--full" (click)="openMap(locale.details?.map_url || '')">
+              <span class="btn__icon icon-svg icon-map"></span>
+              <span>Cómo llegar</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Social Links Section -->
+      <section class="section section--social" data-section="social" *ngIf="hasSocialLinks">
+        <div class="section__inner">
+          <h2 class="section__title">Seguinos</h2>
+
+          <div class="social-grid">
+            <!-- Instagram -->
+            <a *ngIf="resolvedInstagramUrl"
+               [href]="resolvedInstagramUrl"
+               target="_blank"
+               rel="noopener"
+               class="social-link social-link--instagram">
+              <span class="social-link__icon icon-svg icon-instagram" aria-hidden="true"></span>
+              <span class="social-link__label">Instagram</span>
+              <span class="social-link__arrow">→</span>
+            </a>
+
+            <!-- Facebook -->
+            <a *ngIf="resolvedFacebookUrl"
+               [href]="resolvedFacebookUrl"
+               target="_blank"
+               rel="noopener"
+               class="social-link social-link--facebook">
+              <span class="social-link__icon icon-svg icon-facebook" aria-hidden="true"></span>
+              <span class="social-link__label">Facebook</span>
+              <span class="social-link__arrow">→</span>
+            </a>
+
+            <!-- TikTok -->
+            <a *ngIf="resolvedTiktokUrl"
+               [href]="resolvedTiktokUrl"
+               target="_blank"
+               rel="noopener"
+               class="social-link social-link--tiktok">
+              <span class="social-link__icon icon-svg icon-tiktok" aria-hidden="true"></span>
+              <span class="social-link__label">TikTok</span>
+              <span class="social-link__arrow">→</span>
+            </a>
+
+            <!-- Website -->
+            <a *ngIf="resolvedWebsiteUrl"
+               [href]="resolvedWebsiteUrl"
+               target="_blank"
+               rel="noopener"
+               class="social-link social-link--website">
+              <span class="social-link__icon icon-svg icon-website" aria-hidden="true"></span>
+              <span class="social-link__label">Sitio Web</span>
+              <span class="social-link__arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer CTA -->
+      <footer class="footer-cta">
+        <button class="back-btn back-btn--footer" (click)="goBack()">
+          <span class="back-btn__arrow">←</span>
+          <span>Volver a {{ categoryLabel }}</span>
+        </button>
+      </footer>
+
+    </div>
+  </ng-container>
+
+</main>

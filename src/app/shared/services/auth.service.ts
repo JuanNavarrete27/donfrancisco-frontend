@@ -9,6 +9,7 @@ import {
   throwError,
   of
 } from 'rxjs';
+import { apiBaseUrl } from '../config/api.config';
 
 /* ============================================================
    MODELOS
@@ -36,7 +37,7 @@ export interface AuthUser {
   email: string;
 
   // ✅ FIX REAL: ahora acepta marketing también
-  rol: 'admin' | 'marketing' | 'user' | 'funcionario';
+  rol: 'admin' | 'marketing' | 'user' | 'funcionario' | 'local';
 
   telefono?: string;
   foto?: string | null;
@@ -60,20 +61,13 @@ export class AuthService {
 
   private readonly tokenKey = 'df_auth_token';
   private readonly userKey = 'df_auth_user';
-  private readonly apiUrl: string;
+  private readonly apiUrl = apiBaseUrl;
   private readonly isBrowser = typeof window !== 'undefined';
 
   private userSubject = new BehaviorSubject<AuthUser | null>(null);
   public readonly user$ = this.userSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    const globalEnv = (import.meta as any)?.env || (window as any)?.env || {};
-
-    const rawUrl =
-      globalEnv['NG_APP_API_URL'] ||
-      'https://donfrancisco-backend.fly.dev/';
-
-    this.apiUrl = String(rawUrl).replace(/\/$/, '');
 
     /* ==========================
        HIDRATACIÓN INICIAL
@@ -191,6 +185,10 @@ export class AuthService {
     return this.userSubject.value?.rol === 'funcionario';
   }
 
+  isLocal(): boolean {
+    return this.userSubject.value?.rol === 'local';
+  }
+
   // ✅ NUEVO (te sirve si querés en guards/componentes)
   isAdminOrMarketing(): boolean {
     const r = this.userSubject.value?.rol;
@@ -198,7 +196,7 @@ export class AuthService {
   }
 
   // ✅ FIX: incluye marketing
-  getRol(): 'admin' | 'marketing' | 'user' | 'funcionario' | null {
+  getRol(): 'admin' | 'marketing' | 'user' | 'funcionario' | 'local' | null {
     return this.userSubject.value?.rol ?? null;
   }
 
@@ -253,7 +251,7 @@ export class AuthService {
   }
 
   // ✅ Normalización robusta (admin / marketing / funcionario / user)
-  private normalizeRol(rawRol: any): 'admin' | 'marketing' | 'user' | 'funcionario' {
+  private normalizeRol(rawRol: any): 'admin' | 'marketing' | 'user' | 'funcionario' | 'local' {
     const r = String(rawRol ?? '').toLowerCase().trim();
 
     if (!r) return 'user';
@@ -267,6 +265,11 @@ export class AuthService {
     // funcionario aliases
     if (r === 'funcionario' || r === 'empleado' || r === 'employee' || r === 'worker') {
       return 'funcionario';
+    }
+
+    // ✅ local aliases
+    if (r === 'local' || r === 'gerente' || r === 'encargado') {
+      return 'local';
     }
 
     // compat

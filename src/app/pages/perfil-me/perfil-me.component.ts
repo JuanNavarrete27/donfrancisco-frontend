@@ -110,6 +110,7 @@ export class PerfilMeComponent implements OnInit, OnDestroy {
 
     if (role === 'admin' || role === 'administrador') this.roleLabel = 'Administrador';
     else if (role === 'marketing' || role === 'mkt') this.roleLabel = 'Marketing';
+    else if (role === 'local') this.roleLabel = 'Local';
     else if (role === 'funcionario' || role === 'empleado') this.roleLabel = 'Funcionario';
     else this.roleLabel = 'Usuario';
   }

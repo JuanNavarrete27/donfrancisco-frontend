@@ -35,8 +35,31 @@
 
   </section>
 
+  <!-- LOADING STATE -->
+  <section class="list list--empty" *ngIf="loading" aria-label="Cargando locales">
+    <div class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Cargando locales gastronómicos...</p>
+    </div>
+  </section>
+
+  <!-- ERROR STATE -->
+  <section class="list list--empty" *ngIf="error && !loading" aria-label="Error al cargar">
+    <div class="error-message">
+      <p>{{ error }}</p>
+      <button class="chip chip--action" (click)="loadLocales()">Reintentar</button>
+    </div>
+  </section>
+
+  <!-- EMPTY STATE -->
+  <section class="list list--empty" *ngIf="!loading && !error && filtered.length === 0" aria-label="Sin resultados">
+    <div class="empty-message">
+      <p>No se encontraron locales para mostrar.</p>
+    </div>
+  </section>
+
   <!-- LISTA FULL WIDTH -->
-  <section class="list" aria-label="Locales gastronómicos">
+  <section class="list" *ngIf="!loading && !error && filtered.length > 0" aria-label="Locales gastronómicos">
     <button
       #cardEl
       class="card"
@@ -49,13 +72,14 @@
       <div class="card__fx" aria-hidden="true"></div>
       <div class="card__sweep" aria-hidden="true"></div>
 
+      <!-- Cover Image (if available) -->
+      <div class="card__image" *ngIf="l.coverImageUrl" aria-hidden="true">
+        <img [src]="l.coverImageUrl" [alt]="l.nombre" loading="lazy" />
+        <div class="card__image-overlay"></div>
+      </div>
+
       <div class="card__row">
         <div class="card__left">
-          <div class="card__top">
-            <span class="pill">{{ l.tag }}</span>
-            <span class="status" [class.prep]="l.estado==='En preparación'">{{ l.estado }}</span>
-          </div>
-
           <h2 class="card__title">{{ l.nombre }}</h2>
           <p class="card__desc">{{ l.resumen }}</p>
 
@@ -77,29 +101,3 @@
   </section>
 
 </main>
-
-<!-- MODAL -->
-<div class="modal-backdrop" *ngIf="modalOpen" (click)="cerrar()" role="dialog" aria-modal="true">
-  <div class="modal" (click)="stop($event)">
-    <div class="modal__top">
-      <div class="modal__title">{{ selected?.nombre }}</div>
-      <button class="modal__x" type="button" (click)="cerrar()" aria-label="Cerrar">✕</button>
-    </div>
-
-    <div class="modal__body">
-      <div class="modal__meta">
-        <span class="pill">{{ selected?.tag }}</span>
-        <span class="status" [class.prep]="selected?.estado==='En preparación'">{{ selected?.estado }}</span>
-      </div>
-
-      <p class="modal__text">{{ selected?.detalle }}</p>
-
-      <div class="bullets">
-        <div class="bullet" *ngFor="let h of selected?.highlight">
-          <span class="dot"></span>
-          <span>{{ h }}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>

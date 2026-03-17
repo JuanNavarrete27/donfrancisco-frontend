@@ -11,7 +11,9 @@ import {
   ViewChildren
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { LocalService, LocalCore, LocalComplete } from '../../shared/services/local.service';
+import { Subject, takeUntil, forkJoin, of, catchError } from 'rxjs';
 
 type GastroTag = 'Café' | 'Horno' | 'Parrilla' | 'Pastelería' | 'Veggie' | 'Tragos' | 'Bistró';
 
@@ -19,11 +21,13 @@ type GastroLocal = {
   id: string;
   nombre: string;
   tag: GastroTag;
-  estado: 'Próximamente' | 'En preparación';
+  estado: 'Próximamente' | 'Activo';
   resumen: string;
   detalle: string;
   highlight: string[];
   intensidad: 1 | 2 | 3;
+  coverImageUrl?: string;
+  headline?: string;
 };
 
 @Component({
@@ -46,93 +50,21 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
   tags: GastroTag[] = ['Café', 'Horno', 'Parrilla', 'Pastelería', 'Veggie', 'Tragos', 'Bistró'];
   activeTag: GastroTag | 'Todos' = 'Todos';
 
-  // Modal
-  modalOpen = false;
-  selected: GastroLocal | null = null;
+  // Loading y error states
+  loading = false;
+  error: string | null = null;
+
+  // Data
+  locales: GastroLocal[] = [];
 
   // Scroll reveal
   @ViewChildren('cardEl') cardEls!: QueryList<ElementRef<HTMLElement>>;
   private io?: IntersectionObserver;
   private cardChangesSub?: { unsubscribe: () => void };
+  private destroy$ = new Subject<void>();
 
-  // Data (8)
-  locales: GastroLocal[] = [
-    {
-      id: 'g1',
-      nombre: 'Café',
-      tag: 'Café',
-      estado: 'En preparación',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['...'],
-      intensidad: 3
-    },
-    {
-      id: 'g2',
-      nombre: 'Horno de Barro',
-      tag: 'Horno',
-      estado: 'Próximamente',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['...'],
-      intensidad: 3
-    },
-    {
-      id: 'g3',
-      nombre: 'Parrilla',
-      tag: 'Parrilla',
-      estado: 'Próximamente',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['Cocción a la vista'],
-      intensidad: 2
-    },
-    {
-      id: 'g4',
-      nombre: 'Dulce',
-      tag: 'Pastelería',
-      estado: 'En preparación',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['Pastelería artesanal', '...'],
-      intensidad: 2
-    },
-
-    // ✅ CORREGIDOS: los "..." NO pueden ir en tag porque GastroTag es union
-    // Elegí tags válidos para que compile.
-    {
-      id: 'g5',
-      nombre: 'Veggie',
-      tag: 'Veggie',
-      estado: 'En preparación',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['...'],
-      intensidad: 1
-    },
-    {
-      id: 'g6',
-      nombre: 'Bistró',
-      tag: 'Bistró',
-      estado: 'Próximamente',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['...'],
-      intensidad: 1
-    },
-    {
-      id: 'g7',
-      nombre: 'Barra',
-      tag: 'Tragos',
-      estado: 'Próximamente',
-      resumen: '...',
-      detalle: '...',
-      highlight: ['...'],
-      intensidad: 2
-    }
-  ];
-
-  get featured(): GastroLocal {
+  get featured(): GastroLocal | null {
+    if (this.locales.length === 0) return null;
     return this.locales.slice().sort((a, b) => b.intensidad - a.intensidad)[0];
   }
 
@@ -141,6 +73,11 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
     return this.locales.filter(x => x.tag === this.activeTag);
   }
 
+  constructor(
+    private localService: LocalService,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
     this.reducedMotion =
       typeof window !== 'undefined'
@@ -148,6 +85,8 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
         : false;
 
     setTimeout(() => (this.isLoaded = true), 80);
+
+    this.loadLocales();
   }
 
   ngAfterViewInit(): void {
@@ -193,6 +132,9 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
     this.io?.disconnect();
     this.cardChangesSub?.unsubscribe();
     if (typeof window !== 'undefined') document.body.style.overflow = '';
+    
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   @HostListener('mousemove', ['$event'])
@@ -208,19 +150,194 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
     this.activeTag = t;
   }
 
+  /**
+   * Carga los locales desde la API y los mapea al formato GastroLocal
+   */
+  loadLocales(): void {
+    this.loading = true;
+    this.error = null;
+
+    this.localService.getPublicLocalesByCategory('gastronomia')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (locales) => {
+          // Load complete data for each locale to get details
+          this.loadCompleteLocalesWithDetails(locales);
+        },
+        error: (err) => {
+          this.error = typeof err === 'string' ? err : 'Error al cargar los locales';
+          this.loading = false;
+          console.error('Error loading gastronomia locales:', err);
+        }
+      });
+  }
+
+  /**
+   * Load complete locale data with details for each locale
+   */
+  private loadCompleteLocalesWithDetails(locales: LocalCore[]): void {
+    if (locales.length === 0) {
+      this.locales = [];
+      this.loading = false;
+      return;
+    }
+
+    // FIXED: Filter to only include gastronomia slots 1-6
+    const fixedGastroLocales = locales.filter(local => {
+      const localeId = parseInt(local.id);
+      return localeId >= 1 && localeId <= 6;
+    });
+
+    if (fixedGastroLocales.length === 0) {
+      this.locales = [];
+      this.loading = false;
+      return;
+    }
+
+    // Fetch details for each locale
+    const localeObservables = fixedGastroLocales.map(local => 
+      this.localService.getPublicLocaleById(local.id).pipe(
+        catchError(() => {
+          // If details fail, fallback to basic LocalCore data
+          return of({
+            ...local,
+            details: null,
+            media: null
+          });
+        })
+      )
+    );
+
+    forkJoin(localeObservables)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (completeLocales) => {
+          this.locales = completeLocales.map(local => this.mapToGastroLocal(local));
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = 'Error al cargar detalles de los locales';
+          this.loading = false;
+          console.error('Error loading locale details:', err);
+        }
+      });
+  }
+
+  /**
+   * Mapea un LocalComplete del API al formato GastroLocal usado por el template
+   */
+  private mapToGastroLocal(local: LocalComplete | any): GastroLocal {
+    // Determinar tag basado en el nombre o datos del local
+    const tag = this.inferTag(local.display_name);
+    
+    // Determinar intensidad basada en featured
+    const intensidad: 1 | 2 | 3 = local.featured ? 3 : 2;
+
+    // Fixed asset image mapping for gastronomia (slots 1-6)
+    const localeId = parseInt(local.id);
+    const fixedAssetImage = this.getGastroAssetImage(localeId);
+
+    // FIXED: Use fixed slot mapping for correct business names
+    const fixedDisplayName = this.getGastroDisplayName(localeId);
+
+    // Priorizar saved headline over short_description
+    const displayHeadline = local.details?.headline || local.short_description || 'Descubre este lugar único en Don Francisco.';
+    
+    // Usar saved highlights si existen, sino extraer de descripción
+    const highlights = local.details?.highlights?.length 
+      ? local.details.highlights 
+      : this.extractHighlights(local.short_description);
+
+    return {
+      id: local.id,
+      nombre: fixedDisplayName, // FIXED: Use fixed business name instead of backend display_name
+      tag: tag,
+      estado: local.active ? 'Activo' : 'Próximamente', // FIXED: Remove "En preparación"
+      resumen: displayHeadline, // Usar headline guardado
+      detalle: local.long_description || local.short_description || 'Próximamente más información.',
+      highlight: highlights, // Usar highlights guardados
+      intensidad: intensidad,
+      coverImageUrl: fixedAssetImage,
+      headline: local.details?.headline // Guardar headline para posible uso en template
+    };
+  }
+
+  /**
+   * Get fixed business display name for gastronomia slots 1-6
+   */
+  private getGastroDisplayName(localeId: number): string {
+    const nameMap = {
+      1: 'Fornos Milanesas',
+      2: 'Entre Brasas Parrilla',
+      3: 'Fornos Pizzeria',
+      4: 'Sakai Sushi',
+      5: 'San Carlos Coffee',
+      6: 'Cremino Gelatto'
+    };
+    return nameMap[localeId as keyof typeof nameMap] || 'Local Desconocido';
+  }
+
+  /**
+   * Get fixed asset image for gastronomia slots 1-6
+   */
+  private getGastroAssetImage(localeId: number): string {
+    if (localeId >= 1 && localeId <= 6) {
+      const assetMap = {
+        1: 'fornosmilanesas',
+        2: 'entrebrasasparrilla', 
+        3: 'fornospizzeria',
+        4: 'sakaisushi',
+        5: 'sancarloscoffee',
+        6: 'creminogelatto'
+      };
+      return `/assets/${assetMap[localeId as keyof typeof assetMap]}.png`;
+    }
+    return '/assets/default-gastro.png';
+  }
+
+  private inferTag(displayName: string): GastroTag {
+    const name = displayName.toLowerCase();
+    
+    if (name.includes('coffee') || name.includes('café') || name.includes('cake')) return 'Café';
+    if (name.includes('pizza') || name.includes('fornos') || name.includes('horno')) return 'Horno';
+    if (name.includes('parrilla') || name.includes('grill') || name.includes('brasas')) return 'Parrilla';
+    if (name.includes('sushi') || name.includes('ramen') || name.includes('sakai')) return 'Bistró';
+    if (name.includes('gelato') || name.includes('helado') || name.includes('cremino') || name.includes('pastelería')) return 'Pastelería';
+    if (name.includes('hamburguesa') || name.includes('burger')) return 'Veggie';
+    if (name.includes('milanesa') || name.includes('tragos') || name.includes('bar')) return 'Tragos';
+    
+    return 'Bistró'; // default
+  }
+
+  private extractHighlights(description: string): string[] {
+    if (!description) return ['Próximamente'];
+    
+    // Si la descripción tiene comas, usar las partes como highlights
+    const parts = description.split(',').map(p => p.trim()).filter(p => p.length > 0);
+    if (parts.length >= 2 && parts.length <= 4) {
+      return parts.slice(0, 3);
+    }
+    
+    return ['Especialidad única', 'Ambiente premium'];
+  }
+
+  private getGastroSlug(localeId: number): string {
+    const slugMap = {
+      1: 'fornosmilanesas',
+      2: 'entrebrasasparrilla',
+      3: 'fornospizzeria',
+      4: 'sakaisushi',
+      5: 'sancarloscoffee',
+      6: 'creminogelatto'
+    };
+    return slugMap[localeId as keyof typeof slugMap] || 'unknown';
+  }
+
+/**
+   * Navega a la página de detalle del local
+   */
   abrir(local: GastroLocal) {
-    this.selected = local;
-    this.modalOpen = true;
-    if (typeof window !== 'undefined') document.body.style.overflow = 'hidden';
-  }
-
-  cerrar() {
-    this.modalOpen = false;
-    this.selected = null;
-    if (typeof window !== 'undefined') document.body.style.overflow = '';
-  }
-
-  stop(e: MouseEvent) {
-    e.stopPropagation();
+    // FIXED: Navigate by locale id instead of slug
+    this.router.navigate(['/locales/id', local.id]);
   }
 }

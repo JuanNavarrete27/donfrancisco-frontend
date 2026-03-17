@@ -15,13 +15,17 @@
         <p
           class="role"
           [class.admin]="user?.rol === 'admin' || user?.rol === 'marketing'"
+          [class.local]="user?.rol === 'local'"
         >
           {{
             user?.rol === 'admin'
               ? 'Administrador'
               : (user?.rol === 'marketing'
                   ? 'Marketing'
-                  : (user?.rol === 'funcionario' ? 'Funcionario' : 'Usuario')
+                  : (user?.rol === 'local'
+                      ? 'Local'
+                      : (user?.rol === 'funcionario' ? 'Funcionario' : 'Usuario')
+                    )
                 )
           }}
         </p>
@@ -40,6 +44,21 @@
       <div class="info-row">
         <span class="label"></span>
         <strong></strong>
+      </div>
+    </section>
+
+    <!-- ================= LOCAL ROLE ACTION ================= -->
+    <section class="local-section" *ngIf="user?.rol === 'local'">
+      <div class="local-action-card">
+        <h3>Gestión de tu Local</h3>
+        <p>Gestiona el contenido público de tu local desde una página dedicada.</p>
+        <button 
+          type="button" 
+          class="btn btn--primary"
+          routerLink="/local-edit"
+        >
+          Editar mi local
+        </button>
       </div>
     </section>
 
