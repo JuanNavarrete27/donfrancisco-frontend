@@ -26,31 +26,31 @@ const GASTRO_LOCALES: GastroLocal[] = [
     id: 2,
     slug: 'entre-brasas-parrilla-oriental',
     display_name: 'Entre Brasas Parrilla Oriental',
-    image: 'src/assets/entrebrasasparrilla.png'
+    image: 'assets/entrebrasasparrilla.png'
   },
   {
     id: 3,
     slug: 'fornos-pizzeria',
     display_name: 'Fornos Pizzeria',
-    image: 'src/assets/fornospizzeria.png'
+    image: 'assets/fornospizzeria.png'
   },
   {
     id: 4,
     slug: 'fornos-milanesas-chiquitos',
     display_name: 'Fornos Milanesas & Chiquitos',
-    image: 'src/assets/fornosmilanesas.png'
+    image: 'assets/fornosmilanesas.png'
   },
   {
     id: 5,
     slug: 'castagnet-vinoteca',
     display_name: 'Castagnet Vinoteca',
-    image: 'src/assets/castagnetvinoteca.png'
+    image: 'assets/castagnetvinoteca.png'
   },
   {
     id: 6,
     slug: 'fish-market-pescados-mariscos',
     display_name: 'Fish Market Pescados & Mariscos',
-    image: 'src/assets/fishmarketpescaderia.png'
+    image: 'assets/fishmarketpescaderia.png'
   }
 ];
 
