@@ -76,8 +76,8 @@
         <div class="hero__overlay"></div>
 
         <!-- Logo overlay if available -->
-        <div class="hero__logo" *ngIf="locale.logo_url" appGsapEntrance entranceFrom="scale" [entranceDelay]="0.3">
-          <img [src]="locale.logo_url" [alt]="'Logo de ' + locale.display_name" />
+        <div class="hero__logo" *ngIf="resolvedLogoUrl" appGsapEntrance entranceFrom="scale" [entranceDelay]="0.3">
+          <img [src]="resolvedLogoUrl" [alt]="'Logo de ' + locale.display_name" />
         </div>
       </div>
 

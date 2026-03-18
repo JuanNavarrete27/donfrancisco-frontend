@@ -11,6 +11,22 @@ import { LocalService, LocalComplete, LocalDetails, LocalMedia } from '../../sha
 import { ParticleEffectDirective } from '../../shared/directives/particle-effect.directive';
 import { GsapEntranceDirective } from '../../shared/directives/gsap-entrance.directive';
 
+// Canonical frontend logo asset mapping by slug
+const LOGO_ASSET_MAP: Record<string, string> = {
+  'entre-brasas-parrilla': '/assets/entrebrasasparrilla.jpg',
+  'entre-brasas-parrilla-oriental': '/assets/entrebrasasparrilla.jpg',
+  'fornos-milanesas-chiquitos': '/assets/fornosmilanesas.jpg',
+  'fornos-pizzeria': '/assets/fornospizzeria.jpg',
+  'sakai-sushi': '/assets/sakaisushi.jpg',
+  'san-carlos-coffee-cake': '/assets/sancarloscoffee.jpg',
+  'cremino-gelatto-fatto-con-amore': '/assets/creminogelatto.jpg',
+  'castagnet-vinoteca': '/assets/castagnetvinoteca.jpg',
+  'etiqueta-negra-carnes-seleccion-gourmet': '/assets/etiquetanegracarniceria.jpg',
+  'fish-market-pescados-mariscos': '/assets/fishmarketpescaderia.jpg',
+  'la-familia-autoservice': '/assets/lafamiliaautoservice.jpg',
+  'producto-de-cerro-largo': '/assets/productodecerrolargo.jpg'
+};
+
 @Component({
   selector: 'app-locale-detail',
   standalone: true,
@@ -268,6 +284,16 @@ export class LocaleDetailPage implements OnInit, OnDestroy {
       (this.locale as any)?.media?.website_url ??
       '';
     return typeof value === 'string' ? value.trim() : '';
+  }
+
+  // Resolved logo URL: use canonical frontend asset first, fallback to backend logo_url
+  get resolvedLogoUrl(): string | null {
+    if (!this.locale) return null;
+    // First: check canonical frontend asset mapping by slug
+    const mappedAsset = this.slug ? LOGO_ASSET_MAP[this.slug] : null;
+    if (mappedAsset) return mappedAsset;
+    // Fallback: use backend logo_url if available
+    return this.locale.logo_url || null;
   }
 
   // Computed properties for template
