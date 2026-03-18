@@ -30,7 +30,7 @@ const TIENDAS_LOCALES: TiendaLocal[] = [
     image: 'assets/sancarloscoffee.png'
   },
   {
-    id: 8,
+    id: 4,
     slug: 'sakai-sushi',
     display_name: 'Sakai Sushi',
     image: 'assets/sakaisushi.png'
@@ -152,7 +152,7 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
 
   // Navigate to detail page instead of opening modal
   abrir(tienda: TiendaLocal) {
-    this.router.navigate(['/locales', tienda.slug]);
+    this.router.navigate(['/local-detail', tienda.slug]);
   }
 
 }
