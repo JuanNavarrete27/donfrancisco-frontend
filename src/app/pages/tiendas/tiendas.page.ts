@@ -24,22 +24,16 @@ interface TiendaLocal {
 
 const TIENDAS_LOCALES: TiendaLocal[] = [
   {
-    id: 7,
-    slug: 'san-carlos-coffee-cake',
-    display_name: 'San Carlos Coffee & Cake',
-    image: 'assets/sancarloscoffee.png'
+    id: 5,
+    slug: 'castagnet-vinoteca',
+    display_name: 'Castagnet Vinoteca',
+    image: 'assets/castagnetvinoteca.png'
   },
   {
-    id: 4,
-    slug: 'sakai-sushi',
-    display_name: 'Sakai Sushi',
-    image: 'assets/sakaisushi.png'
-  },
-  {
-    id: 9,
-    slug: 'cremino-gelatto-fatto-con-amore',
-    display_name: 'Cremino Gelatto',
-    image: 'assets/creminogelatto.png'
+    id: 6,
+    slug: 'fish-market-pescados-mariscos',
+    display_name: 'Fish Market Pescados & Mariscos',
+    image: 'assets/fishmarketpescaderia.png'
   },
   {
     id: 10,
@@ -152,7 +146,7 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
 
   // Navigate to detail page instead of opening modal
   abrir(tienda: TiendaLocal) {
-    this.router.navigate(['/local-detail', tienda.slug]);
+    this.router.navigate(['/locales', tienda.slug]);
   }
 
 }

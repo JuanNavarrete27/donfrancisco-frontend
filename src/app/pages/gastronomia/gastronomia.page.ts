@@ -24,7 +24,7 @@ interface GastroLocal {
 const GASTRO_LOCALES: GastroLocal[] = [
   {
     id: 2,
-    slug: 'entre-brasas-parrilla-oriental',
+    slug: 'entre-brasas-parrilla',
     display_name: 'Entre Brasas Parrilla Oriental',
     image: 'assets/entrebrasasparrilla.png'
   },
@@ -41,16 +41,22 @@ const GASTRO_LOCALES: GastroLocal[] = [
     image: 'assets/fornosmilanesas.png'
   },
   {
-    id: 5,
-    slug: 'castagnet-vinoteca',
-    display_name: 'Castagnet Vinoteca',
-    image: 'assets/castagnetvinoteca.png'
+    id: 8,
+    slug: 'sakai-sushi',
+    display_name: 'Sakai Sushi',
+    image: 'assets/sakaisushi.png'
   },
   {
-    id: 6,
-    slug: 'fish-market-pescados-mariscos',
-    display_name: 'Fish Market Pescados & Mariscos',
-    image: 'assets/fishmarketpescaderia.png'
+    id: 7,
+    slug: 'san-carlos-coffee-cake',
+    display_name: 'San Carlos Coffee & Cake',
+    image: 'assets/sancarloscoffee.png'
+  },
+  {
+    id: 9,
+    slug: 'cremino-gelatto-fatto-con-amore',
+    display_name: 'Cremino Gelatto',
+    image: 'assets/creminogelatto.png'
   }
 ];
 
@@ -156,6 +162,6 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
    * Navega a la página de detalle del local
    */
   abrir(local: GastroLocal) {
-    this.router.navigate(['/local-detail', local.slug]);
+    this.router.navigate(['/locales', local.slug]);
   }
 }
