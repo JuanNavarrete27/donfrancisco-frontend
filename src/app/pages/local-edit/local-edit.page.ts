@@ -209,12 +209,12 @@ export class LocalEditPage implements OnInit, OnDestroy {
     this.saving = true;
     this.clearMessages();
 
-    // Save social links only
+    // Save social links only - use mediaForm values directly
     const mediaPayload = {
-      instagram_url: this.resolvedInstagramUrl,
-      facebook_url: this.resolvedFacebookUrl,
-      tiktok_url: this.resolvedTiktokUrl,
-      website_url: this.resolvedWebsiteUrl
+      instagram_url: this.mediaForm.instagram_url?.trim() || '',
+      facebook_url: this.mediaForm.facebook_url?.trim() || '',
+      tiktok_url: this.mediaForm.tiktok_url?.trim() || '',
+      website_url: this.mediaForm.website_url?.trim() || ''
     };
 
     this.localService.updateMyLocalMedia(mediaPayload)
