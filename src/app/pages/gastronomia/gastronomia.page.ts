@@ -156,6 +156,6 @@ export class GastronomiaPage implements OnInit, AfterViewInit, OnDestroy {
    * Navega a la página de detalle del local
    */
   abrir(local: GastroLocal) {
-    this.router.navigate(['/local-detail', local.slug]);
+    this.router.navigate(['/locales', local.slug]);
   }
 }
