@@ -146,7 +146,7 @@ export class TiendasPage implements OnInit, AfterViewInit, OnDestroy {
 
   // Navigate to detail page instead of opening modal
   abrir(tienda: TiendaLocal) {
-    this.router.navigate(['/locales', tienda.slug]);
+    this.router.navigate(['/locales', 'id', tienda.id]);
   }
 
 }
