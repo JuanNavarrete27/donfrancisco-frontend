@@ -13,17 +13,17 @@ import { GsapEntranceDirective } from '../../shared/directives/gsap-entrance.dir
 
 // Canonical frontend logo asset mapping by locale id
 const LOGO_ASSET_MAP_BY_ID: Record<number, string> = {
-  2: '/assets/entrebrasasparrilla.jpg',
-  3: '/assets/fornospizzeria.jpg',
-  4: '/assets/fornosmilanesas.jpg',
-  5: '/assets/castagnetvinoteca.jpg',
-  6: '/assets/fishmarketpescaderia.jpg',
-  7: '/assets/sancarloscoffee.jpg',
-  8: '/assets/sakaisushi.jpg',
-  9: '/assets/creminogelatto.jpg',
-  10: '/assets/lafamiliaautoservice.jpg',
-  11: '/assets/etiquetanegracarniceria.jpg',
-  12: '/assets/productodecerrolargo.jpg'
+  2: '/assets/entrebrasasparrilla.png',
+  3: '/assets/fornospizzeria.png',
+  4: '/assets/fornosmilanesas.png',
+  5: '/assets/castagnetvinoteca.png',
+  6: '/assets/fishmarketpescaderia.png',
+  7: '/assets/sancarloscoffee.png',
+  8: '/assets/sakaisushi.png',
+  9: '/assets/creminogelatto.png',
+  10: '/assets/lafamiliaautoservice.png',
+  11: '/assets/etiquetanegracarniceria.png',
+  12: '/assets/productodecerrolargo.png'
 };
 
 @Component({
