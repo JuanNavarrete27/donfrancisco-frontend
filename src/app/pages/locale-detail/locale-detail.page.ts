@@ -11,20 +11,19 @@ import { LocalService, LocalComplete, LocalDetails, LocalMedia } from '../../sha
 import { ParticleEffectDirective } from '../../shared/directives/particle-effect.directive';
 import { GsapEntranceDirective } from '../../shared/directives/gsap-entrance.directive';
 
-// Canonical frontend logo asset mapping by slug
-const LOGO_ASSET_MAP: Record<string, string> = {
-  'entre-brasas-parrilla': '/assets/entrebrasasparrilla.jpg',
-  'entre-brasas-parrilla-oriental': '/assets/entrebrasasparrilla.jpg',
-  'fornos-milanesas-chiquitos': '/assets/fornosmilanesas.jpg',
-  'fornos-pizzeria': '/assets/fornospizzeria.jpg',
-  'sakai-sushi': '/assets/sakaisushi.jpg',
-  'san-carlos-coffee-cake': '/assets/sancarloscoffee.jpg',
-  'cremino-gelatto-fatto-con-amore': '/assets/creminogelatto.jpg',
-  'castagnet-vinoteca': '/assets/castagnetvinoteca.jpg',
-  'etiqueta-negra-carnes-seleccion-gourmet': '/assets/etiquetanegracarniceria.jpg',
-  'fish-market-pescados-mariscos': '/assets/fishmarketpescaderia.jpg',
-  'la-familia-autoservice': '/assets/lafamiliaautoservice.jpg',
-  'producto-de-cerro-largo': '/assets/productodecerrolargo.jpg'
+// Canonical frontend logo asset mapping by locale id
+const LOGO_ASSET_MAP_BY_ID: Record<number, string> = {
+  2: '/assets/entrebrasasparrilla.jpg',
+  3: '/assets/fornospizzeria.jpg',
+  4: '/assets/fornosmilanesas.jpg',
+  5: '/assets/castagnetvinoteca.jpg',
+  6: '/assets/fishmarketpescaderia.jpg',
+  7: '/assets/sancarloscoffee.jpg',
+  8: '/assets/sakaisushi.jpg',
+  9: '/assets/creminogelatto.jpg',
+  10: '/assets/lafamiliaautoservice.jpg',
+  11: '/assets/etiquetanegracarniceria.jpg',
+  12: '/assets/productodecerrolargo.jpg'
 };
 
 @Component({
@@ -286,13 +285,15 @@ export class LocaleDetailPage implements OnInit, OnDestroy {
     return typeof value === 'string' ? value.trim() : '';
   }
 
-  // Resolved logo URL: use canonical frontend asset first, fallback to backend logo_url
+  // Resolved logo URL: use canonical frontend asset by id first, fallback to backend logo_url
   get resolvedLogoUrl(): string | null {
     if (!this.locale) return null;
-    // First: check canonical frontend asset mapping by slug
-    const mappedAsset = this.slug ? LOGO_ASSET_MAP[this.slug] : null;
-    if (mappedAsset) return mappedAsset;
-    // Fallback: use backend logo_url if available
+
+    const localeId = Number(this.locale.id);
+    if (LOGO_ASSET_MAP_BY_ID[localeId]) {
+      return LOGO_ASSET_MAP_BY_ID[localeId];
+    }
+
     return this.locale.logo_url || null;
   }
 
