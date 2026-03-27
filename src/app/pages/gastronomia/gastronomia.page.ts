@@ -36,8 +36,8 @@ const GASTRO_LOCALES: GastroLocal[] = [
   },
   {
     id: 4,
-    slug: 'fornos-milanesas-chiquitos',
-    display_name: 'Fornos Milanesas & Chiquitos',
+    slug: 'fornos-milanesas-chivitos',
+    display_name: 'Fornos Milanesas & Chivitos',
     image: 'assets/fornosmilanesas.png'
   },
   {
